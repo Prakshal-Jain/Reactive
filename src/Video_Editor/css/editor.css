@@ -1,7 +1,5 @@
-.uploader_container{
-    display: flex;
-    justify-content: center;
-    margin: 2em;
+body{
+    background: #1f242a;
 }
 
 .file-drop{
@@ -9,7 +7,7 @@
     height: fit-content;
     font-weight: bold;
     font-size: large;
-    color: #7b7979;
+    color: #fff;
 }
 
 .file-drop > .file-drop-target{
@@ -22,20 +20,13 @@
 }
 
 .file-drop > .file-drop-target.file-drop-dragging-over-target{
-    border-color: #7b7979;
+    border-color: #90ee90;
     transition: border-color .3s ease;
+    color: #cacaca
 }
 
 .hidden{
     display: none;
-}
-
-.video{
-    width: 60%;
-    height: auto;
-    text-align: center;
-    border-radius: 1em;
-    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
 }
 
 .toolBar{
@@ -45,3 +36,163 @@
     border-radius: 1em;
     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
 }
+
+/* Styling for Editing */
+.wrapper {
+    width: 60%;
+    max-width: 90%;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .video {
+    width: 100%;
+    cursor: pointer;
+    border-radius: 1em;
+  }
+  
+  .playback {
+    position: relative;
+    margin-top: 1rem;
+    margin-left: 24px;
+    margin-right: 24px;
+    height: 10px;
+    background: #2f3b44;
+    margin-bottom: 1rem;
+    border-radius: 1em;
+  }
+  .playback .seekable {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ccc;
+    cursor: pointer;
+  }
+  .playback .grabber {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 24px;
+    border-radius: 2px;
+    z-index: 1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .playback .grabber.start {
+    background: #a8d736;
+    left: 0;
+    margin-left: -24px;
+  }
+  .playback .grabber.end {
+    background: #fc4242;
+    right: 0;
+    margin-right: -24px;
+  }
+  .playback .grabber:hover {
+    transform: scaleY(1.4);
+  }
+  .playback .grabber svg {
+    user-drag: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+  }
+  .playback .progress {
+    background: #0072cf;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
+    pointer-events: none;
+  }
+  
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+  }
+  .controls .player-controls button {
+    width: 34px;
+    margin: 0 0.125rem;
+  }
+  .controls .player-controls .play-control {
+    background: #2f3b44;
+    border: 0;
+    color: #a5b0b5;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .controls .player-controls .play-control:hover {
+    background: #445562;
+  }
+  .controls .player-controls .seek-start {
+    background: #2f3b44;
+    border: 0;
+    color: #a5b0b5;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .controls .player-controls .seek-start:hover {
+    background: #445562;
+  }
+  .controls .player-controls .seek-end {
+    background: #2f3b44;
+    border: 0;
+    color: #a5b0b5;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .controls .player-controls .seek-end:hover {
+    background: #445562;
+  }
+  .controls .reset-control {
+    background: #2f3b44;
+    border: 0;
+    color: #a5b0b5;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .controls .reset-control:hover {
+    background: #445562;
+  }
+  .controls .trim-control {
+    background: #0072cf;
+    border: 0;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .controls .trim-control:hover {
+    background: #038eff;
+  }

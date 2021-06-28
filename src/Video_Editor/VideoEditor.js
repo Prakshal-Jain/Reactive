@@ -21,7 +21,7 @@ class VideoEditor extends React.Component {
 
     render_uploader = () => {
         return(
-            <div className={"uploader_container"}>
+            <div className={"wrapper"}>
                 <input
                     onChange={(e) => this.upload_file(e.target.files)}
                     type="file"
