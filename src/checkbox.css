@@ -1,0 +1,23 @@
+.square-icon {
+  background-color: transparent;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 0.25em;
+  text-align: center;
+  line-height: 1.2em;
+  vertical-align: middle;
+  color: #F04E26;
+  margin: 0.5em;
+}
+
+.check_label{
+  margin-left: 0.5em;
+}
+
+.active{
+  border: 0.15em solid #F04E26;
+}
+
+.inactive{
+  border: 0.15em solid #6c757d;
+}

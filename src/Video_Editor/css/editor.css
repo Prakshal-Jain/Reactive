@@ -1,0 +1,47 @@
+.uploader_container{
+    display: flex;
+    justify-content: center;
+    margin: 2em;
+}
+
+.file-drop{
+    width: 100%;
+    height: fit-content;
+    font-weight: bold;
+    font-size: large;
+    color: #7b7979;
+}
+
+.file-drop > .file-drop-target{
+    transition: border-color .3s ease;
+    border: 0.2em dotted #f04e26;
+    border-radius: 1em;
+    text-align: center;
+    padding: 8em 0em;
+    cursor: pointer;
+}
+
+.file-drop > .file-drop-target.file-drop-dragging-over-target{
+    border-color: #7b7979;
+    transition: border-color .3s ease;
+}
+
+.hidden{
+    display: none;
+}
+
+.video{
+    width: 60%;
+    height: auto;
+    text-align: center;
+    border-radius: 1em;
+    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+}
+
+.toolBar{
+    padding: 1em;
+    margin: 2em;
+    text-align: center;
+    border-radius: 1em;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
