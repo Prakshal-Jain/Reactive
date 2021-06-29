@@ -5,11 +5,14 @@ class Editor extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isMuted: false
+            isMuted: false,
+            startTime: 0,
+            endTime: null,
         }
     }
 
     componentDidMount = () => {
+        const self = this
         var video = document.getElementsByClassName('video')[0],
         playbackBar = document.getElementsByClassName('playback')[0],
         playbackRect = null,
@@ -63,7 +66,9 @@ class Editor extends React.Component {
 
         var resetVideo = function () {
         player.start = 0;
+        self.setState({startTime: player.start})
         player.end = player.video.duration;
+        self.setState({endTime: player.end})
         player.video.currentTime = 0;
         startGrabber.style.left = '0';
         endGrabber.style.left = '100%';
@@ -93,6 +98,7 @@ class Editor extends React.Component {
 
         var updateSeekableStart = function () {
         player.start = player.video.duration * frontTrimmedRatio;
+        self.setState({startTime: player.start})
         seekableBar.style.left = frontTrimmedRatio * 100 + '%';
         startGrabber.style.left = frontTrimmedRatio * 100 + '%';
         updateProgressBar();
@@ -101,6 +107,7 @@ class Editor extends React.Component {
 
         var updateSeekableEnd = function (event) {
         player.end = player.video.duration * endTrimmedRatio;
+        self.setState({endTime: player.endTime})
         seekableBar.style.right = (1 - endTrimmedRatio) * 100 + '%';
         endGrabber.style.left = endTrimmedRatio * 100 + '%';
 
@@ -192,6 +199,7 @@ class Editor extends React.Component {
 
         video.addEventListener('loadeddata', function () {
         player.end = player.video.duration;
+        self.setState({endTime: player.end})
         });
 
         video.addEventListener('timeupdate', function () {

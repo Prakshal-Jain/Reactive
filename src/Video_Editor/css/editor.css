@@ -1,13 +1,8 @@
-body{
-    background: #1f242a;
-}
-
 .file-drop{
     width: 100%;
     height: fit-content;
     font-weight: bold;
     font-size: large;
-    color: #fff;
 }
 
 .file-drop > .file-drop-target{
@@ -35,6 +30,22 @@ body{
     text-align: center;
     border-radius: 1em;
     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+
+.toggle{
+  background-color:rgb(185, 185, 185);
+  color: yellow;
+  height: 2em;
+  width: 2em;
+  text-align: center;
+  line-height: 2em;
+  vertical-align: middle;
+  border-radius: 100em;
+  font-size: x-large;
+  z-index: 100;
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
 }
 
 /* Styling for Editing */

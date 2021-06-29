@@ -9,10 +9,12 @@ class VideoEditor extends React.Component {
         this.state = {
             isUpload: true,
             videoUrl: "",
+            isDarkMode: false,
         }
     }
 
     componentDidMount = () => {
+        this.toggleThemes()
         document.addEventListener('drop', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -44,6 +46,18 @@ class VideoEditor extends React.Component {
         )
     }
 
+    toggleThemes = () =>{
+        if(this.state.isDarkMode){
+            document.body.style.backgroundColor = "#1f242a";
+            document.body.style.color = "#fff";
+        }
+        else{
+            document.body.style.backgroundColor = "#fff";
+            document.body.style.color = "#1f242a";
+        }
+        this.setState({isDarkMode: !this.state.isDarkMode})
+    }
+
     upload_file = (fileInput) => {
 		let fileUrl = window.URL.createObjectURL(fileInput[0]);
         let filename = fileInput.name;
@@ -57,6 +71,7 @@ class VideoEditor extends React.Component {
         return(
             <div>
                 {this.state.isUpload ? this.render_uploader() : this.render_editor()}
+                <div className={"theme_toggler"} onClick={this.toggleThemes}>{this.state.isDarkMode? (<i class="fa fa-lightbulb-o toggle" aria-hidden="true"></i>) : <i class="fa fa-moon-o toggle"></i>}</div>
             </div>
         )
     }
