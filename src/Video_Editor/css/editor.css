@@ -46,6 +46,13 @@
   position: fixed;
   bottom: 1em;
   right: 1em;
+  cursor: pointer;
+  transition: background-color .2s ease;
+}
+
+.toggle:hover{
+  transition: background-color .2s ease;
+  background-color:rgb(146, 146, 146);
 }
 
 /* Styling for Editing */
@@ -102,12 +109,10 @@
   }
   .playback .grabber.start {
     background: #a8d736;
-    left: 0;
     margin-left: -24px;
   }
   .playback .grabber.end {
     background: #fc4242;
-    right: 0;
     margin-right: -24px;
   }
   .playback .grabber:hover {
@@ -179,7 +184,7 @@
   .controls .player-controls .seek-end:hover {
     background: #445562;
   }
-  .controls .reset-control {
+  .controls .settings-control {
     background: #2f3b44;
     border: 0;
     color: #a5b0b5;
@@ -190,7 +195,7 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
-  .controls .reset-control:hover {
+  .controls .settings-control:hover {
     background: #445562;
   }
   .controls .trim-control {
@@ -206,4 +211,19 @@
   }
   .controls .trim-control:hover {
     background: #038eff;
+  }
+
+  .margined{
+    margin: 0em 0.3em;
+  }
+
+  .warning{
+    padding: 0.8em;
+    color: #da7f00;
+    background-color: #ffecd1;
+    border-radius: 0.3em;
+    border: 0.1em solid #f0ad4e;
+    margin: 1em;
+    justify-content: center;
+    text-align: center;
   }
