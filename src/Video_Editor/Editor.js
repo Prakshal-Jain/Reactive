@@ -30,13 +30,12 @@ class Editor extends React.Component {
         var self = this
         this.playVideo.current.addEventListener('timeupdate', function () {
             var seek = (self.playVideo.current.currentTime - self.state.timings[self.state.currently_grabbed.index].start) / self.playVideo.current.duration * 100;
-            console.log(seek)
             self.progressBar.current.style.width = `${seek}%`;
             if ((self.playVideo.current.currentTime >= self.state.timings[self.state.timings.length-1].end)){
                 self.playVideo.current.pause()
                 self.setState({playing: false, counter: 0, currently_grabbed: {"index": 0, "type": "start"}}, () => {
                     self.playVideo.current.currentTime = self.state.timings[0].start;
-                    self.progressBar.current.style.left = self.state.timings[0].start / self.playVideo.current.duration * 100;
+                    self.progressBar.current.style.left = `${self.state.timings[0].start / self.playVideo.current.duration * 100}%`;
                     self.progressBar.current.style.width = "0%";
                 })
             }
@@ -68,21 +67,6 @@ class Editor extends React.Component {
             this.playVideo.current.play()
         }
         this.setState({playing: !this.state.playing})
-    }
-
-    updateProgress = (event) => {
-        var playbackRect = this.playBackBar.current.getBoundingClientRect();
-        var seekRatio = (event.clientX - playbackRect.left) / playbackRect.width
-        var idx = 0
-        var temp_time = this.playVideo.current.duration * seekRatio
-        for(let x of this.state.timings){
-            if(x.start <= temp_time && x.end >= temp_time){
-                this.setState({currently_grabbed: {"index": idx, "type": "start"}, counter: idx}, () => {
-                    this.playVideo.current.currentTime = temp_time
-                })
-            }
-            idx += 1;
-        }
     }
 
     startGrabberMove = (event) => {
@@ -117,7 +101,9 @@ class Editor extends React.Component {
                         this.deleteGrabber(index)
                     }
                     else{
-                        window.addEventListener('mousemove', this.startGrabberMove); this.setState({currently_grabbed: {"index": index, "type": "start"}, counter: index})
+                        this.setState({currently_grabbed: {"index": index, "type": "start"}, counter: index}, () => {
+                            window.addEventListener('mousemove', this.startGrabberMove);
+                        });
                     }
                 }}>
                     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="10" height="14" viewBox="0 0 10 14" xmlSpace="preserve">
@@ -129,7 +115,9 @@ class Editor extends React.Component {
                         this.deleteGrabber(index)
                     }
                     else{
-                        window.addEventListener('mousemove', this.startGrabberMove); this.setState({currently_grabbed: {"index": index, "type": "end"}, counter: index})
+                        this.setState({currently_grabbed: {"index": index, "type": "end"}, counter: index}, () => {
+                            window.addEventListener('mousemove', this.startGrabberMove);
+                        });
                     }
                 }}>
                     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="10" height="14" viewBox="0 0 10 14" xmlSpace="preserve">
@@ -177,21 +165,16 @@ class Editor extends React.Component {
         if(this.state.playing){
             this.playVideo.current.pause()
         }
-        this.playVideo.current.currentTime = this.state.timings[0].start;
-        this.progressBar.current.style.left = this.state.timings[0].start / this.playVideo.current.duration * 100;
-        this.progressBar.current.style.width = "0%";
-        this.setState({currently_grabbed: {"index": 0, "type": "start"}, counter: 0})
+        this.setState({currently_grabbed: {"index": 0, "type": "start"}, counter: 0}, () => {
+            this.progressBar.current.style.left = `${this.state.timings[0].start / this.playVideo.current.duration * 100}%`;
+            this.playVideo.current.currentTime = this.state.timings[0].start;
+        })
     }
 
     skipEnd = () => {
-        if(this.state.playing){
-            this.playVideo.current.pause()
-        }
-        const curr_time = this.state.timings[this.state.timings.length-1].end
-        this.playVideo.current.currentTime = curr_time;
-        this.progressBar.current.style.left = this.state.timings[0].start / this.playVideo.current.duration * 100;
-        this.progressBar.current.style.width = curr_time / this.playVideo.current.duration * 100;
-        this.setState({currently_grabbed: {"index": (this.state.timings.length-1), "type": "end"}, counter: this.state.timings.length-1})
+    }
+
+    updateProgress = (event) => {
     }
 
     render = () => {
