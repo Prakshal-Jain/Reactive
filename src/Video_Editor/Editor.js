@@ -189,9 +189,9 @@ class Editor extends React.Component {
         if(this.state.playing){
             this.playVideo.current.pause()
         }
-        this.setState({currently_grabbed: {"index": 0, "type": "start"}, counter: 0}, () => {
+        this.setState({currently_grabbed: {"index": 0, "type": "start"}, counter: 0, playing: false}, () => {
             this.progressBar.current.style.left = `${this.state.timings[0].start / this.playVideo.current.duration * 100}%`;
-            this.playVideo.current.currentTime = this.state.timings[0].start;
+            this.playVideo.current.currentTime = 0;
         })
     }
 

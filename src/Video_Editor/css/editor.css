@@ -7,7 +7,7 @@
 
 .file-drop > .file-drop-target{
     transition: border-color .3s ease;
-    border: 0.2em dotted #f04e26;
+    border: 0.2em solid #f04e26;
     border-radius: 1em;
     text-align: center;
     padding: 8em 0em;
@@ -48,6 +48,13 @@
   right: 1em;
   cursor: pointer;
   transition: background-color .2s ease;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+     -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+
 }
 
 .toggle:hover{
@@ -66,6 +73,13 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+
   }
   
   .video {
