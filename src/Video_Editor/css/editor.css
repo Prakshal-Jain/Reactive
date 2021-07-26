@@ -104,7 +104,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: #ccc;
+    background: rgb(221, 221, 221);
     cursor: pointer;
   }
   .playback .grabber {

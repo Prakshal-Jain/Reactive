@@ -62,6 +62,25 @@ class Editor extends React.Component {
         }
     }
 
+    reset = () => {
+        this.playVideo.current.pause()
+        this.setState({
+            isMuted: false,
+            timings: [{'start': 0, 'end': this.playVideo.current.duration}],
+            playing: false,
+            currently_grabbed: {"index": 0, "type": "none"},
+            difference: 0.2,
+            deletingGrabber: false,
+            current_warning: null,
+            counter: 0,
+            imageUrl: ""
+        }, () => {
+            this.playVideo.current.currentTime = this.state.timings[0].start;
+            this.progressBar.current.style.left = `${this.state.timings[0].start / this.playVideo.current.duration * 100}%`;
+            this.progressBar.current.style.width = "0%";
+        })
+    }
+
     captureSnapshot = () => {
         var video = this.playVideo.current
         const canvas = document.createElement("canvas");
@@ -83,6 +102,16 @@ class Editor extends React.Component {
         a.click(); //Downloaded file
     }
 
+    skipStart = () => {
+        if(this.state.playing){
+            this.playVideo.current.pause()
+        }
+        this.setState({currently_grabbed: {"index": 0, "type": "start"}, counter: 0, playing: false}, () => {
+            this.progressBar.current.style.left = `${this.state.timings[0].start / this.playVideo.current.duration * 100}%`;
+            this.playVideo.current.currentTime = 0;
+        })
+    }
+
     play_pause = () => {
         if(this.state.playing){
             this.playVideo.current.pause()
@@ -91,6 +120,41 @@ class Editor extends React.Component {
             this.playVideo.current.play()
         }
         this.setState({playing: !this.state.playing})
+    }
+
+
+    skipEnd = () => {
+        if(this.state.playing){
+            this.playVideo.current.pause()
+        }
+        this.setState({currently_grabbed: {"index": 0, "type": "start"}, counter: 0, playing: false}, () => {
+            this.progressBar.current.style.left = `${this.state.timings[0].start / this.playVideo.current.duration * 100}%`;
+            this.progressBar.current.style.width = '0%'
+            this.playVideo.current.currentTime = this.state.timings[this.state.timings.length-1].end-0.01;
+        })
+    }
+
+    updateProgress = (event) => {
+        var playbackRect = this.playBackBar.current.getBoundingClientRect();
+        var seekTime = ((event.clientX - playbackRect.left) / playbackRect.width) * this.playVideo.current.duration
+        this.playVideo.current.pause()
+        // find where seekTime is in the segment
+        var index = -1;
+        var counter = 0;
+        for(let times of this.state.timings){
+            if(seekTime >= times.start && seekTime <= times.end){
+                index = counter;
+            }
+            counter += 1;
+        }
+        if(index == -1){
+            return
+        }
+        this.setState({playing: false, counter: index, currently_grabbed: {"index": index, "type": "start"}}, () => {
+            this.progressBar.current.style.width = '0%' // Since the width is set later, this is necessary to hide weird UI
+            this.progressBar.current.style.left = `${this.state.timings[index].start / this.playVideo.current.duration * 100}%`
+            this.playVideo.current.currentTime = seekTime
+        })
     }
 
     startGrabberMove = (event) => {
@@ -185,22 +249,6 @@ class Editor extends React.Component {
         this.progressBar.current.style.width = "0%"
     }
 
-    skipStart = () => {
-        if(this.state.playing){
-            this.playVideo.current.pause()
-        }
-        this.setState({currently_grabbed: {"index": 0, "type": "start"}, counter: 0, playing: false}, () => {
-            this.progressBar.current.style.left = `${this.state.timings[0].start / this.playVideo.current.duration * 100}%`;
-            this.playVideo.current.currentTime = 0;
-        })
-    }
-
-    skipEnd = () => {
-    }
-
-    updateProgress = (event) => {
-    }
-
     render = () => {
         return(
             <div className="wrapper">
@@ -215,19 +263,19 @@ class Editor extends React.Component {
 
                 <div className="controls">
                     <div className="player-controls">
-                        <button className="settings-control" title="Reset Video"><FontAwesomeIcon icon={faSync} /></button>
+                        <button className="settings-control" title="Reset Video" onClick={this.reset}><FontAwesomeIcon icon={faSync} /></button>
                         <button className="settings-control" title="Mute/Unmute Video" onClick={() => this.setState({isMuted: !this.state.isMuted})}>{this.state.isMuted ? <FontAwesomeIcon icon={faVolumeMute} /> : <FontAwesomeIcon icon={faVolumeUp} />}</button>
                         <button className="settings-control" title="Capture Thumbnail" onClick={this.captureSnapshot}><FontAwesomeIcon icon={faCamera} /></button>
                     </div>
                     <div className="player-controls">
-                        <button className="seek-start" title="Skip to Start" onClick={this.skipStart}><FontAwesomeIcon icon={faStepBackward} /></button>
+                        <button className="seek-start" title="Skip to first clip" onClick={this.skipStart}><FontAwesomeIcon icon={faStepBackward} /></button>
                         <button className="play-control" title="Play/Pause" onClick={this.play_pause.bind(this)} >{this.state.playing ? <FontAwesomeIcon icon={faPause} /> : <FontAwesomeIcon icon={faPlay} /> }</button>
-                        <button className="seek-end" title="Skip to End" onClick={this.skipEnd}><FontAwesomeIcon icon={faStepForward} /></button>
+                        <button className="seek-end" title="Skip to last clip" onClick={this.skipEnd}><FontAwesomeIcon icon={faStepForward} /></button>
                     </div>
                     <div>
-                        <button className="trim-control margined" onClick={this.addGrabber}>Add <FontAwesomeIcon icon={faGripLinesVertical} /></button>
-                        <button className="trim-control margined" onClick={this.preDeleteGrabber}>Delete <FontAwesomeIcon icon={faGripLinesVertical} /></button>
-                        <button className="trim-control" onClick={() => alert('This would redirect to a completion page.')}>Trim</button>
+                        <button  title="Add grabber" className="trim-control margined" onClick={this.addGrabber}>Add <FontAwesomeIcon icon={faGripLinesVertical} /></button>
+                        <button title="Delete grabber" className="trim-control margined" onClick={this.preDeleteGrabber}>Delete <FontAwesomeIcon icon={faGripLinesVertical} /></button>
+                        <button title="Trim video" className="trim-control" onClick={() => alert('This would redirect to a completion page.')}>Trim</button>
                     </div>
                 </div>
                 {this.state.current_warning != null ? <div className={"warning"}>{this.warnings[this.state.current_warning]}</div> : ""}
