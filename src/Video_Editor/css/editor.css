@@ -104,14 +104,14 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgb(221, 221, 221);
+    background: rgb(240, 240, 240);
     cursor: pointer;
   }
   .playback .grabber {
     position: absolute;
     top: -4px;
     bottom: -4px;
-    width: 24px;
+    width: 18px;
     border-radius: 2px;
     z-index: 1;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
@@ -123,11 +123,9 @@
   }
   .playback .grabber.start {
     background: #a8d736;
-    margin-left: -24px;
   }
   .playback .grabber.end {
     background: #fc4242;
-    margin-right: -24px;
   }
   .playback .grabber:hover {
     transform: scaleY(1.4);

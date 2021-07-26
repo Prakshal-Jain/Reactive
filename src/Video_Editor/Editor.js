@@ -78,6 +78,7 @@ class Editor extends React.Component {
             this.playVideo.current.currentTime = this.state.timings[0].start;
             this.progressBar.current.style.left = `${this.state.timings[0].start / this.playVideo.current.duration * 100}%`;
             this.progressBar.current.style.width = "0%";
+            this.addActiveSegments();
         })
     }
 
@@ -258,9 +259,10 @@ class Editor extends React.Component {
             return
         }
         time.splice(index, 1);
-        this.progressBar.current.style.left = `${time[0].start / this.playVideo.current.duration * 100}%`
-        this.playVideo.current.currentTime = time[0].start
-        this.progressBar.current.style.width = "0%"
+        this.progressBar.current.style.left = `${time[0].start / this.playVideo.current.duration * 100}%`;
+        this.playVideo.current.currentTime = time[0].start;
+        this.progressBar.current.style.width = "0%";
+        this.addActiveSegments();
     }
 
     addActiveSegments = () => {
