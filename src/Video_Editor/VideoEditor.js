@@ -2,6 +2,9 @@ import React from 'react';
 import { FileDrop } from 'react-file-drop'
 import './css/editor.css'
 import Editor from './Editor'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faLightbulb, faMoon } from '@fortawesome/free-solid-svg-icons'
+
 
 class VideoEditor extends React.Component {
     constructor(props) {
@@ -71,7 +74,7 @@ class VideoEditor extends React.Component {
         return(
             <div>
                 {this.state.isUpload ? this.render_uploader() : this.render_editor()}
-                <div className={"theme_toggler"} onClick={this.toggleThemes}>{this.state.isDarkMode? (<i class="fa fa-lightbulb-o toggle" aria-hidden="true"></i>) : <i class="fa fa-moon-o toggle"></i>}</div>
+                <div className={"theme_toggler"} onClick={this.toggleThemes}>{this.state.isDarkMode? (<i className="toggle" aria-hidden="true"><FontAwesomeIcon icon={faLightbulb} /></i>) : <i className="toggle"><FontAwesomeIcon icon={faMoon} /></i>}</div>
             </div>
         )
     }
