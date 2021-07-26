@@ -172,6 +172,9 @@ body{
   .controls .player-controls .play-control:hover {
     background: #445562;
   }
+  .controls .player-controls .play-control:active {
+    color: #ffffff;
+  }
   .controls .player-controls .seek-start {
     background: #2f3b44;
     border: 0;
@@ -185,6 +188,9 @@ body{
   }
   .controls .player-controls .seek-start:hover {
     background: #445562;
+  }
+  .controls .player-controls .seek-start:active {
+    color: #ffffff;
   }
   .controls .player-controls .seek-end {
     background: #2f3b44;
@@ -200,6 +206,9 @@ body{
   .controls .player-controls .seek-end:hover {
     background: #445562;
   }
+  .controls .player-controls .seek-end:active {
+    color: #ffffff;
+  }
   .controls .settings-control {
     background: #2f3b44;
     border: 0;
@@ -211,6 +220,11 @@ body{
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
+
+  .controls .settings-control:active {
+    color: #ffffff;
+  }
+  
   .controls .settings-control:hover {
     background: #445562;
   }
