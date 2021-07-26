@@ -1,7 +1,7 @@
 import React from 'react';
 import './css/editor.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faVolumeMute, faVolumeUp, faPause, faPlay, faGripLinesVertical, faSync, faStepBackward, faStepForward } from '@fortawesome/free-solid-svg-icons'
+import { faVolumeMute, faVolumeUp, faPause, faPlay, faGripLinesVertical, faSync, faStepBackward, faStepForward, faCamera, faDownload, faEraser } from '@fortawesome/free-solid-svg-icons'
 
 class Editor extends React.Component {
     constructor(props) {
@@ -15,6 +15,7 @@ class Editor extends React.Component {
             deletingGrabber: false,
             current_warning: null,
             counter: 0,
+            imageUrl: ""
         }
         this.playVideo = React.createRef();
         this.progressBar = React.createRef();
@@ -24,6 +25,8 @@ class Editor extends React.Component {
     warnings = {
         "delete_grabber": (<div>Please click on the grabber (either start or end) to delete it</div>)
     }
+
+    reader = new FileReader();
 
     componentDidMount = () => {
         // Check if video ended
@@ -57,6 +60,27 @@ class Editor extends React.Component {
             time.push({'start': 0, 'end': this.playVideo.current.duration})
             this.setState({timings: time});
         }
+    }
+
+    captureSnapshot = () => {
+        var video = this.playVideo.current
+        const canvas = document.createElement("canvas");
+        // scale the canvas accordingly
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        // draw the video at that frame
+        canvas.getContext('2d')
+        .drawImage(video, 0, 0, canvas.width, canvas.height);
+        // convert it to a usable data URL
+        const dataURL = canvas.toDataURL();
+        this.setState({imageUrl: dataURL})
+    }
+
+    downloadSnapshot = () => {
+        var a = document.createElement("a"); //Create <a>
+        a.href = this.state.imageUrl; //Image Base64 Goes here
+        a.download = "Thumbnail.png"; //File name Here
+        a.click(); //Downloaded file
     }
 
     play_pause = () => {
@@ -151,6 +175,7 @@ class Editor extends React.Component {
 
     deleteGrabber = (index) => {
         var time = this.state.timings
+        this.setState({timings: time, deletingGrabber: false, current_warning: null, currently_grabbed: {"index": 0, "type": "start"}, counter: 0})
         if(time.length == 1){
             return
         }
@@ -158,7 +183,6 @@ class Editor extends React.Component {
         this.progressBar.current.style.left = `${time[0].start / this.playVideo.current.duration * 100}%`
         this.playVideo.current.currentTime = time[0].start
         this.progressBar.current.style.width = "0%"
-        this.setState({timings: time, deletingGrabber: false, current_warning: null, currently_grabbed: {"index": 0, "type": "start"}})
     }
 
     skipStart = () => {
@@ -192,7 +216,8 @@ class Editor extends React.Component {
                 <div className="controls">
                     <div className="player-controls">
                         <button className="settings-control" title="Reset Video"><FontAwesomeIcon icon={faSync} /></button>
-                        <button className={"settings-control"} title="Mute/Unmute Video" onClick={() => this.setState({isMuted: !this.state.isMuted})}>{this.state.isMuted ? <FontAwesomeIcon icon={faVolumeMute} /> : <FontAwesomeIcon icon={faVolumeUp} />}</button>
+                        <button className="settings-control" title="Mute/Unmute Video" onClick={() => this.setState({isMuted: !this.state.isMuted})}>{this.state.isMuted ? <FontAwesomeIcon icon={faVolumeMute} /> : <FontAwesomeIcon icon={faVolumeUp} />}</button>
+                        <button className="settings-control" title="Capture Thumbnail" onClick={this.captureSnapshot}><FontAwesomeIcon icon={faCamera} /></button>
                     </div>
                     <div className="player-controls">
                         <button className="seek-start" title="Skip to Start" onClick={this.skipStart}><FontAwesomeIcon icon={faStepBackward} /></button>
@@ -206,6 +231,17 @@ class Editor extends React.Component {
                     </div>
                 </div>
                 {this.state.current_warning != null ? <div className={"warning"}>{this.warnings[this.state.current_warning]}</div> : ""}
+                {(this.state.imageUrl != "") ? 
+                    <div className={"marginVertical"}>
+                        <img src={this.state.imageUrl} className={"thumbnail"} />
+                        <div className="controls">
+                            <div className="player-controls">
+                                <button className="settings-control" title="Reset Video" onClick={this.downloadSnapshot}><FontAwesomeIcon icon={faDownload} /></button>
+                                <button className="settings-control" title="Reset Video" onClick={() => {this.setState({imageUrl: ""})}}><FontAwesomeIcon icon={faEraser} /></button>
+                            </div>
+                        </div>
+                    </div>
+                : ""}
             </div>
         )
     }

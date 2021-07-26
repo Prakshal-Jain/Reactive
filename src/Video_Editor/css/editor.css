@@ -227,3 +227,16 @@
     justify-content: center;
     text-align: center;
   }
+
+  .thumbnail{
+    width: 20%;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+    border: 0.2em solid black;
+    border-radius: 0.3em;
+  }
+
+  .marginVertical{
+    margin: 1.5em 0em;
+  }
