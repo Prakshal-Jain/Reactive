@@ -36,11 +36,7 @@ class Editor extends React.Component {
             self.progressBar.current.style.width = `${seek}%`;
             if ((self.playVideo.current.currentTime >= self.state.timings[self.state.timings.length-1].end)){
                 self.playVideo.current.pause()
-                self.setState({playing: false, currently_grabbed: {"index": 0, "type": "start"}}, () => {
-                    self.playVideo.current.currentTime = self.state.timings[0].start;
-                    self.progressBar.current.style.left = `${self.state.timings[0].start / self.playVideo.current.duration * 100}%`;
-                    self.progressBar.current.style.width = "0%";
-                })
+                self.setState({playing: false})
             }
             else if(self.playVideo.current.currentTime >= self.state.timings[curr_idx].end){
                 if((curr_idx+1) < self.state.timings.length){
@@ -61,7 +57,9 @@ class Editor extends React.Component {
         var time = this.state.timings
         this.playVideo.current.onloadedmetadata = () => {
             time.push({'start': 0, 'end': this.playVideo.current.duration})
-            this.setState({timings: time});
+            this.setState({timings: time}, () => {
+                this.addActiveSegments()
+            });
         }
     }
 
@@ -117,10 +115,19 @@ class Editor extends React.Component {
     }
 
     play_pause = () => {
+        var self = this
         if(this.state.playing){
             this.playVideo.current.pause()
         }
         else{
+            if ((self.playVideo.current.currentTime >= self.state.timings[self.state.timings.length-1].end)){
+                self.playVideo.current.pause()
+                self.setState({playing: false, currently_grabbed: {"index": 0, "type": "start"}}, () => {
+                    self.playVideo.current.currentTime = self.state.timings[0].start;
+                    self.progressBar.current.style.left = `${self.state.timings[0].start / self.playVideo.current.duration * 100}%`;
+                    self.progressBar.current.style.width = "0%";
+                })
+            }
             this.playVideo.current.play()
         }
         this.setState({playing: !this.state.playing})
@@ -168,7 +175,7 @@ class Editor extends React.Component {
         var seekRatio = (event.clientX - playbackRect.left) / playbackRect.width
         const index = this.state.currently_grabbed.index
         const type = this.state.currently_grabbed.type
-        window.addEventListener("mouseup", () => {window.removeEventListener('mousemove', this.startGrabberMove)})
+        window.addEventListener("mouseup", () => {window.removeEventListener('mousemove', this.startGrabberMove); this.addActiveSegments()})
         var time = this.state.timings
         var seek = this.playVideo.current.duration * seekRatio
         if((type == "start") && (seek > ((index != 0) ? (time[index-1].end+this.state.difference+0.2) : 0)) && seek < time[index].end-this.state.difference){
@@ -230,7 +237,9 @@ class Editor extends React.Component {
             return
         }
         time.push({"start": end+0.2, "end": this.playVideo.current.duration})
-        this.setState({timings: time})
+        this.setState({timings: time}, () => {
+            this.addActiveSegments()
+        })
     }
 
     preDeleteGrabber = () => {
@@ -252,6 +261,21 @@ class Editor extends React.Component {
         this.progressBar.current.style.left = `${time[0].start / this.playVideo.current.duration * 100}%`
         this.playVideo.current.currentTime = time[0].start
         this.progressBar.current.style.width = "0%"
+    }
+
+    addActiveSegments = () => {
+        var colors = ""
+        var counter = 0
+        colors += `, rgb(240, 240, 240) 0%, rgb(240, 240, 240) ${this.state.timings[0].start / this.playVideo.current.duration * 100}%`
+        for(let times of this.state.timings){
+            if(counter > 0){
+                colors += `, rgb(240, 240, 240) ${this.state.timings[counter-1].end / this.playVideo.current.duration * 100}%, rgb(240, 240, 240) ${times.start / this.playVideo.current.duration * 100}%`
+            }
+            colors += `, #ccc ${times.start / this.playVideo.current.duration * 100}%, #ccc ${times.end / this.playVideo.current.duration * 100}%`
+            counter += 1
+        }
+        colors += `, rgb(240, 240, 240) ${this.state.timings[counter-1].end / this.playVideo.current.duration * 100}%, rgb(240, 240, 240) 100%`
+        this.playBackBar.current.style.background = `linear-gradient(to right${colors})`;
     }
 
     render = () => {
