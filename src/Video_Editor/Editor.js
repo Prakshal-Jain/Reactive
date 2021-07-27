@@ -282,6 +282,10 @@ class Editor extends React.Component {
     }
 
     saveVideo = () => {
+        var metadata = {
+            "trim_times": this.state.timings,
+            "mute": this.state.isMuted
+        }
         this.props.saveVideo(metadata)
     }
 
