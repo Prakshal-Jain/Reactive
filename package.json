@@ -1,6 +1,6 @@
 {
   "name": "react-video-editor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": false,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.35",

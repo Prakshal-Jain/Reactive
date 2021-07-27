@@ -1,7 +1,7 @@
 <center><img src="./images/Reactive.png" style="width: 30%; height: auto"/></center>
 
 # Reactive: React Video Editor
-Reactive is a react based video editor make with the mission to build the simplest yet powerful video editing software. So, buckle up & let's get started!
+Reactive is a react based video editor made with the mission to build the simplest yet powerful video editing software. So, buckle up & let's get started!
 
 ## Getting started:
 1. Please make sure you have npm installed
