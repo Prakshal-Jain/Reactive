@@ -5,7 +5,6 @@ import Editor from './Editor'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLightbulb, faMoon } from '@fortawesome/free-solid-svg-icons'
 
-
 class VideoEditor extends React.Component {
     constructor(props) {
         super(props);
@@ -45,6 +44,9 @@ class VideoEditor extends React.Component {
 
     render_editor = () => {
         return(
+            // Props:
+            // videoUrl --> URL of uploaded video
+            // saveVideo(<metadata of edited video>) --> gives the cut times and if video is muted or not
             <Editor videoUrl={this.state.videoUrl}/>
         )
     }

@@ -3,6 +3,7 @@ import './css/editor.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVolumeMute, faVolumeUp, faPause, faPlay, faGripLinesVertical, faSync, faStepBackward, faStepForward, faCamera, faDownload, faEraser } from '@fortawesome/free-solid-svg-icons'
 
+
 class Editor extends React.Component {
     constructor(props) {
         super(props);
@@ -280,6 +281,10 @@ class Editor extends React.Component {
         this.playBackBar.current.style.background = `linear-gradient(to right${colors})`;
     }
 
+    saveVideo = () => {
+        this.props.saveVideo(metadata)
+    }
+
     render = () => {
         return(
             <div className="wrapper">
@@ -306,7 +311,7 @@ class Editor extends React.Component {
                     <div>
                         <button title="Add grabber" className="trim-control margined" onClick={this.addGrabber}>Add <FontAwesomeIcon icon={faGripLinesVertical} /></button>
                         <button title="Delete grabber" className="trim-control margined" onClick={this.preDeleteGrabber}>Delete <FontAwesomeIcon icon={faGripLinesVertical} /></button>
-                        <button title="Trim video" className="trim-control" onClick={() => alert('This would redirect to a completion page.')}>Trim</button>
+                        <button title="Save changes" className="trim-control" onClick={this.saveVideo}>Save</button>
                     </div>
                 </div>
                 {this.state.current_warning != null ? <div className={"warning"}>{this.warnings[this.state.current_warning]}</div> : ""}
@@ -316,7 +321,7 @@ class Editor extends React.Component {
                         <div className="controls">
                             <div className="player-controls">
                                 <button className="settings-control" title="Reset Video" onClick={this.downloadSnapshot}><FontAwesomeIcon icon={faDownload} /></button>
-                                <button className="settings-control" title="Reset Video" onClick={() => {this.setState({imageUrl: ""})}}><FontAwesomeIcon icon={faEraser} /></button>
+                                <button className="settings-control" title="Save Video" onClick={() => {this.setState({imageUrl: ""})}}><FontAwesomeIcon icon={faEraser} /></button>
                             </div>
                         </div>
                     </div>
