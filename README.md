@@ -6,6 +6,10 @@ Reactive is a react based video editor made with the mission to build the simple
 ## Demo
 Enjoy reactive here: https://prakshal-jain.github.io/Reactive/
 
+## Install NPM package:
+To install reactive NPM package, run ```npm i react-video-editor```
+URL: https://www.npmjs.com/package/react-video-editor
+
 ## Getting started:
 1. Please make sure you have npm installed
 2. Clone the repository, and run ```npm install```. This downloads all the dependencies required.
