@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/Reactive/static/css/main.8b5d2386.chunk.css",
+    "main.js": "/Reactive/static/js/main.acc40bd1.chunk.js",
+    "main.js.map": "/Reactive/static/js/main.acc40bd1.chunk.js.map",
+    "runtime-main.js": "/Reactive/static/js/runtime-main.9112f69d.js",
+    "runtime-main.js.map": "/Reactive/static/js/runtime-main.9112f69d.js.map",
+    "static/js/2.5f8cfd76.chunk.js": "/Reactive/static/js/2.5f8cfd76.chunk.js",
+    "static/js/2.5f8cfd76.chunk.js.map": "/Reactive/static/js/2.5f8cfd76.chunk.js.map",
+    "static/js/3.275ca38c.chunk.js": "/Reactive/static/js/3.275ca38c.chunk.js",
+    "static/js/3.275ca38c.chunk.js.map": "/Reactive/static/js/3.275ca38c.chunk.js.map",
+    "index.html": "/Reactive/index.html",
+    "static/css/main.8b5d2386.chunk.css.map": "/Reactive/static/css/main.8b5d2386.chunk.css.map",
+    "static/js/2.5f8cfd76.chunk.js.LICENSE.txt": "/Reactive/static/js/2.5f8cfd76.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.9112f69d.js",
+    "static/js/2.5f8cfd76.chunk.js",
+    "static/css/main.8b5d2386.chunk.css",
+    "static/js/main.acc40bd1.chunk.js"
+  ]
+}
