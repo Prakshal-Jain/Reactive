@@ -42,12 +42,17 @@ class VideoEditor extends React.Component {
         )
     }
 
+    saveVideo = (metadata) => {
+        console.log(metadata)
+        alert("Please check your console to see all the metadata. This can be used for video post-processing.")
+    }
+
     render_editor = () => {
         return(
             // Props:
             // videoUrl --> URL of uploaded video
             // saveVideo(<metadata of edited video>) --> gives the cut times and if video is muted or not
-            <Editor videoUrl={this.state.videoUrl}/>
+            <Editor videoUrl={this.state.videoUrl} saveVideo={this.saveVideo}/>
         )
     }
 
