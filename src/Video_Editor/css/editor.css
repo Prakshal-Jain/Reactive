@@ -270,3 +270,18 @@ body{
   .marginVertical{
     margin: 1.5em 0em;
   }
+
+  .videoChange{
+    z-index: 1000;
+    margin-top: 50vh;
+  }
+
+  .videoChange .arrows{
+    font-size: larger;
+    background-color:rgb(92, 92, 92);
+    padding: 1em;
+    border-radius: 0.2em;
+    margin: 0.2em;
+    color: white;
+    cursor: pointer;
+  }

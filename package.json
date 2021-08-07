@@ -13,6 +13,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-file-drop": "^3.1.2",
+    "react-notifications-component": "^3.1.0",
     "react-scripts": "4.0.3",
     "web-vitals": "^1.0.1"
   },

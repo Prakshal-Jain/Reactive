@@ -4,13 +4,16 @@ import './css/editor.css'
 import Editor from './Editor'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLightbulb, faMoon } from '@fortawesome/free-solid-svg-icons'
+import ReactNotification from 'react-notifications-component'
+import { store } from 'react-notifications-component';
+import 'react-notifications-component/dist/theme.css'
 
 class VideoEditor extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             isUpload: true,
-            videoUrl: "",
+            videos: [],
             isDarkMode: false,
         }
     }
@@ -28,9 +31,11 @@ class VideoEditor extends React.Component {
             <div className={"wrapper"}>
                 <input
                     onChange={(e) => this.upload_file(e.target.files)}
+                    accept={"video/*"}
                     type="file"
                     className="hidden"
                     id="up_file"
+                    multiple
                 />
                 <FileDrop
                     onDrop={(e) => this.upload_file(e)}
@@ -50,10 +55,25 @@ class VideoEditor extends React.Component {
     render_editor = () => {
         return(
             // Props:
-            // videoUrl --> URL of uploaded video
+            // videos --> videos data
             // saveVideo(<metadata of edited video>) --> gives the cut times and if video is muted or not
-            <Editor videoUrl={this.state.videoUrl} saveVideo={this.saveVideo}/>
+            <Editor videoUrl={this.state.videos} saveVideo={this.saveVideo}/>
         )
+    }
+
+    renderNotification = (text, type) => {
+        store.addNotification({
+            message: text,
+            type: type,
+            insert: "top",
+            container: "top-right",
+            animationIn: ["animate__animated", "animate__fadeIn"],
+            animationOut: ["animate__animated", "animate__fadeOut"],
+            dismiss: {
+              duration: 5000,
+              onScreen: true
+            }
+        });
     }
 
     toggleThemes = () =>{
@@ -69,11 +89,15 @@ class VideoEditor extends React.Component {
     }
 
     upload_file = (fileInput) => {
-		let fileUrl = window.URL.createObjectURL(fileInput[0]);
-        let filename = fileInput.name;
+        for(let files of fileInput){
+            if(!files.type.match("video/*")){
+                this.renderNotification("Please upload only video files.", "danger")
+                return
+            }
+        }
         this.setState({
             isUpload: false,
-            videoUrl: fileUrl
+            videos: fileInput
         })
     }
 
@@ -82,6 +106,7 @@ class VideoEditor extends React.Component {
             <div>
                 {this.state.isUpload ? this.render_uploader() : this.render_editor()}
                 <div className={"theme_toggler"} onClick={this.toggleThemes}>{this.state.isDarkMode? (<i className="toggle" aria-hidden="true"><FontAwesomeIcon icon={faLightbulb} /></i>) : <i className="toggle"><FontAwesomeIcon icon={faMoon} /></i>}</div>
+                <ReactNotification />
             </div>
         )
     }

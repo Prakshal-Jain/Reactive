@@ -1,7 +1,7 @@
 import React from 'react';
 import './css/editor.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faVolumeMute, faVolumeUp, faPause, faPlay, faGripLinesVertical, faSync, faStepBackward, faStepForward, faCamera, faDownload, faEraser } from '@fortawesome/free-solid-svg-icons'
+import { faVolumeMute, faVolumeUp, faPause, faPlay, faGripLinesVertical, faSync, faStepBackward, faStepForward, faCamera, faDownload, faEraser, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons'
 
 
 class Editor extends React.Component {
@@ -9,13 +9,14 @@ class Editor extends React.Component {
         super(props);
         this.state = {
             isMuted: false,
-            timings: [],
+            timings: null,
             playing: false,
-            currently_grabbed: {"index": 0, "type": "none"},
+            currently_grabbed: null,
             difference: 0.2,
             deletingGrabber: false,
             current_warning: null,
-            imageUrl: ""
+            imageUrl: "",
+            currentVideo: 0
         }
         this.playVideo = React.createRef();
         this.progressBar = React.createRef();
@@ -29,7 +30,13 @@ class Editor extends React.Component {
     reader = new FileReader();
 
     componentDidMount = () => {
-        // Check if video ended
+        var all_timings = []
+        for(let items of this.props.videoUrl){
+            all_timings.push([])
+        }
+        this.setState({timings: all_timings})
+
+        // Logic to handle video play and styling
         var self = this
         this.playVideo.current.addEventListener('timeupdate', function () {
             var curr_idx = self.state.currently_grabbed.index
@@ -55,13 +62,18 @@ class Editor extends React.Component {
                 self.play_pause();
             }
         });
-        var time = this.state.timings
-        this.playVideo.current.onloadedmetadata = () => {
-            time.push({'start': 0, 'end': this.playVideo.current.duration})
-            this.setState({timings: time}, () => {
-                this.addActiveSegments()
-            });
+    }
+
+    addVideoDuration = () => {
+        if(this.state.timings[this.state.currentVideo].length > 0){
+            this.addActiveSegments();
+            return
         }
+        var time = this.state.timings
+        time[this.state.currentVideo].push({'start': 0, 'end': this.playVideo.current.duration})
+        this.setState({timings: time}, () => {
+            this.addActiveSegments()
+        });
     }
 
     reset = () => {
@@ -196,7 +208,7 @@ class Editor extends React.Component {
     }
 
     renderGrabbers = () => {
-        return this.state.timings.map((x, index) => (
+        return this.state.timings[this.state.currentVideo].map((x, index) => (
             <div key={"grabber_"+index}>
                 <div className="grabber start" style={{left: `${x.start / this.playVideo.current.duration * 100}%`}} onMouseDown={(event) => {
                     if(this.state.deletingGrabber){
@@ -269,15 +281,15 @@ class Editor extends React.Component {
     addActiveSegments = () => {
         var colors = ""
         var counter = 0
-        colors += `, rgb(240, 240, 240) 0%, rgb(240, 240, 240) ${this.state.timings[0].start / this.playVideo.current.duration * 100}%`
-        for(let times of this.state.timings){
+        colors += `, rgb(240, 240, 240) 0%, rgb(240, 240, 240) ${this.state.timings[this.state.currentVideo][0].start / this.playVideo.current.duration * 100}%`
+        for(let times of this.state.timings[this.state.currentVideo]){
             if(counter > 0){
-                colors += `, rgb(240, 240, 240) ${this.state.timings[counter-1].end / this.playVideo.current.duration * 100}%, rgb(240, 240, 240) ${times.start / this.playVideo.current.duration * 100}%`
+                colors += `, rgb(240, 240, 240) ${this.state.timings[this.state.currentVideo][counter-1].end / this.playVideo.current.duration * 100}%, rgb(240, 240, 240) ${times.start / this.playVideo.current.duration * 100}%`
             }
             colors += `, #ccc ${times.start / this.playVideo.current.duration * 100}%, #ccc ${times.end / this.playVideo.current.duration * 100}%`
             counter += 1
         }
-        colors += `, rgb(240, 240, 240) ${this.state.timings[counter-1].end / this.playVideo.current.duration * 100}%, rgb(240, 240, 240) 100%`
+        colors += `, rgb(240, 240, 240) ${this.state.timings[this.state.currentVideo][counter-1].end / this.playVideo.current.duration * 100}%, rgb(240, 240, 240) 100%`
         this.playBackBar.current.style.background = `linear-gradient(to right${colors})`;
     }
 
@@ -291,45 +303,51 @@ class Editor extends React.Component {
 
     render = () => {
         return(
-            <div className="wrapper">
-                <video className="video" autoload="metadata" muted={this.state.isMuted} ref={this.playVideo} onClick={this.play_pause.bind(this)} >
-                    <source src={this.props.videoUrl} type="video/mp4" />
-                </video>
-                <div className="playback">
-                    {this.renderGrabbers()}
-                    <div className="seekable" ref={this.playBackBar} onClick={this.updateProgress}></div>
-                    <div className="progress" ref={this.progressBar}></div>
-                </div>
+            <div>
+                <div className="wrapper">
+                    <video key={this.state.currentVideo} className="video" autoload="metadata" muted={this.state.isMuted} ref={this.playVideo} onClick={this.play_pause.bind(this)} onLoadedMetadata={this.addVideoDuration}>
+                        <source src={window.URL.createObjectURL(this.props.videoUrl[this.state.currentVideo])} type={this.props.videoUrl[this.state.currentVideo].type} />
+                    </video>
+                    <div className="playback">
+                        {this.state.timings != null ? this.renderGrabbers() : ""}
+                        <div className="seekable" ref={this.playBackBar} onClick={this.updateProgress}></div>
+                        <div className="progress" ref={this.progressBar}></div>
+                    </div>
 
-                <div className="controls">
-                    <div className="player-controls">
-                        <button className="settings-control" title="Reset Video" onClick={this.reset}><FontAwesomeIcon icon={faSync} /></button>
-                        <button className="settings-control" title="Mute/Unmute Video" onClick={() => this.setState({isMuted: !this.state.isMuted})}>{this.state.isMuted ? <FontAwesomeIcon icon={faVolumeMute} /> : <FontAwesomeIcon icon={faVolumeUp} />}</button>
-                        <button className="settings-control" title="Capture Thumbnail" onClick={this.captureSnapshot}><FontAwesomeIcon icon={faCamera} /></button>
-                    </div>
-                    <div className="player-controls">
-                        <button className="seek-start" title="Skip to previous clip" onClick={this.skipPrevious}><FontAwesomeIcon icon={faStepBackward} /></button>
-                        <button className="play-control" title="Play/Pause" onClick={this.play_pause.bind(this)} >{this.state.playing ? <FontAwesomeIcon icon={faPause} /> : <FontAwesomeIcon icon={faPlay} /> }</button>
-                        <button className="seek-end" title="Skip to next clip" onClick={this.skipNext}><FontAwesomeIcon icon={faStepForward} /></button>
-                    </div>
-                    <div>
-                        <button title="Add grabber" className="trim-control margined" onClick={this.addGrabber}>Add <FontAwesomeIcon icon={faGripLinesVertical} /></button>
-                        <button title="Delete grabber" className="trim-control margined" onClick={this.preDeleteGrabber}>Delete <FontAwesomeIcon icon={faGripLinesVertical} /></button>
-                        <button title="Save changes" className="trim-control" onClick={this.saveVideo}>Save</button>
-                    </div>
-                </div>
-                {this.state.current_warning != null ? <div className={"warning"}>{this.warnings[this.state.current_warning]}</div> : ""}
-                {(this.state.imageUrl != "") ? 
-                    <div className={"marginVertical"}>
-                        <img src={this.state.imageUrl} className={"thumbnail"} />
-                        <div className="controls">
-                            <div className="player-controls">
-                                <button className="settings-control" title="Reset Video" onClick={this.downloadSnapshot}><FontAwesomeIcon icon={faDownload} /></button>
-                                <button className="settings-control" title="Save Video" onClick={() => {this.setState({imageUrl: ""})}}><FontAwesomeIcon icon={faEraser} /></button>
-                            </div>
+                    <div className="controls">
+                        <div className="player-controls">
+                            <button className="settings-control" title="Reset Video" onClick={this.reset}><FontAwesomeIcon icon={faSync} /></button>
+                            <button className="settings-control" title="Mute/Unmute Video" onClick={() => this.setState({isMuted: !this.state.isMuted})}>{this.state.isMuted ? <FontAwesomeIcon icon={faVolumeMute} /> : <FontAwesomeIcon icon={faVolumeUp} />}</button>
+                            <button className="settings-control" title="Capture Thumbnail" onClick={this.captureSnapshot}><FontAwesomeIcon icon={faCamera} /></button>
+                        </div>
+                        <div className="player-controls">
+                            <button className="seek-start" title="Skip to previous clip" onClick={this.skipPrevious}><FontAwesomeIcon icon={faStepBackward} /></button>
+                            <button className="play-control" title="Play/Pause" onClick={this.play_pause.bind(this)} >{this.state.playing ? <FontAwesomeIcon icon={faPause} /> : <FontAwesomeIcon icon={faPlay} /> }</button>
+                            <button className="seek-end" title="Skip to next clip" onClick={this.skipNext}><FontAwesomeIcon icon={faStepForward} /></button>
+                        </div>
+                        <div>
+                            <button title="Add grabber" className="trim-control margined" onClick={this.addGrabber}>Add <FontAwesomeIcon icon={faGripLinesVertical} /></button>
+                            <button title="Delete grabber" className="trim-control margined" onClick={this.preDeleteGrabber}>Delete <FontAwesomeIcon icon={faGripLinesVertical} /></button>
+                            <button title="Save changes" className="trim-control" onClick={this.saveVideo}>Save</button>
                         </div>
                     </div>
-                : ""}
+                    {this.state.current_warning != null ? <div className={"warning"}>{this.warnings[this.state.current_warning]}</div> : ""}
+                    {(this.state.imageUrl != "") ? 
+                        <div className={"marginVertical"}>
+                            <img src={this.state.imageUrl} className={"thumbnail"} />
+                            <div className="controls">
+                                <div className="player-controls">
+                                    <button className="settings-control" title="Reset Video" onClick={this.downloadSnapshot}><FontAwesomeIcon icon={faDownload} /></button>
+                                    <button className="settings-control" title="Save Video" onClick={() => {this.setState({imageUrl: ""})}}><FontAwesomeIcon icon={faEraser} /></button>
+                                </div>
+                            </div>
+                        </div>
+                    : ""}
+                </div>
+                <div className={"videoChange"}>
+                    <FontAwesomeIcon icon={faAngleLeft} style={{float: 'left'}} className={`arrows ${this.state.currentVideo == 0 ? "hidden" : ""}`} onClick={() => {this.setState({currentVideo: this.state.currentVideo-1})}}/>
+                    <FontAwesomeIcon icon={faAngleRight} style={{float: 'right'}} className={`arrows ${this.state.currentVideo >= this.props.videoUrl.length-1 ? "hidden" : ""}`} onClick={() => {this.setState({currentVideo: this.state.currentVideo+1})}}/>
+                </div>
             </div>
         )
     }
