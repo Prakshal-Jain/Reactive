@@ -31,27 +31,31 @@ class Editor extends React.Component {
 
     componentDidMount = () => {
         var all_timings = []
+        var all_grabbed = []
         for(let items of this.props.videoUrl){
             all_timings.push([])
+            all_grabbed.push({"index": 0, "type": "none"})
         }
-        this.setState({timings: all_timings})
+        this.setState({timings: all_timings, currently_grabbed: all_grabbed})
 
         // Logic to handle video play and styling
         var self = this
         this.playVideo.current.addEventListener('timeupdate', function () {
-            var curr_idx = self.state.currently_grabbed.index
-            var seek = (self.playVideo.current.currentTime - self.state.timings[curr_idx].start) / self.playVideo.current.duration * 100;
+            var curr_idx = self.state.currently_grabbed[this.state.currentVideo].index
+            var seek = (self.playVideo.current.currentTime - self.state.timings[this.state.currentVideo][curr_idx].start) / self.playVideo.current.duration * 100;
             self.progressBar.current.style.width = `${seek}%`;
-            if ((self.playVideo.current.currentTime >= self.state.timings[self.state.timings.length-1].end)){
+            if ((self.playVideo.current.currentTime >= self.state.timings[this.state.currentVideo][self.state.timings.length-1].end)){
                 self.playVideo.current.pause()
                 self.setState({playing: false})
             }
-            else if(self.playVideo.current.currentTime >= self.state.timings[curr_idx].end){
-                if((curr_idx+1) < self.state.timings.length){
-                    self.setState({currently_grabbed: {"index": curr_idx+1, "type": "start"}}, () => {
+            else if(self.playVideo.current.currentTime >= self.state.timings[this.state.currentVideo][curr_idx].end){
+                if((curr_idx+1) < self.state.timings[this.state.currentVideo].length){
+                    var grabbed = this.state.currently_grabbed
+                    grabbed[this.state.currentVideo] = {"index": curr_idx+1, "type": "start"}
+                    self.setState({currently_grabbed: grabbed}, () => {
                         self.progressBar.current.style.width = '0%'
-                        self.progressBar.current.style.left = `${self.state.timings[curr_idx+1].start / self.playVideo.current.duration * 100}%`;
-                        self.playVideo.current.currentTime = self.state.timings[curr_idx+1].start;
+                        self.progressBar.current.style.left = `${self.state.timings[this.state.currentVideo][curr_idx+1].start / self.playVideo.current.duration * 100}%`;
+                        self.playVideo.current.currentTime = self.state.timings[this.state.currentVideo][curr_idx+1].start;
                     })
                 }
             }
@@ -64,6 +68,7 @@ class Editor extends React.Component {
         });
     }
 
+    // Add start and end durations to every video
     addVideoDuration = () => {
         if(this.state.timings[this.state.currentVideo].length > 0){
             this.addActiveSegments();
@@ -78,14 +83,21 @@ class Editor extends React.Component {
 
     reset = () => {
         this.playVideo.current.pause()
+        var all_timings = []
+        var all_grabbed = []
+        for(let items of this.props.videoUrl){
+            all_timings.push([])
+            all_grabbed.push({"index": 0, "type": "none"})
+        }
         this.setState({
             isMuted: false,
-            timings: [{'start': 0, 'end': this.playVideo.current.duration}],
+            timings: all_timings,
             playing: false,
-            currently_grabbed: {"index": 0, "type": "none"},
+            currently_grabbed: all_grabbed,
             difference: 0.2,
             deletingGrabber: false,
             current_warning: null,
+            currently_grabbed: 0,
             imageUrl: ""
         }, () => {
             this.playVideo.current.currentTime = this.state.timings[0].start;
@@ -120,11 +132,11 @@ class Editor extends React.Component {
         if(this.state.playing){
             this.playVideo.current.pause()
         }
-        var prev_idx = (this.state.currently_grabbed.index != 0) ? (this.state.currently_grabbed.index-1) : (this.state.timings.length-1)
+        var prev_idx = (this.state.currently_grabbed[this.state.currentVideo].index != 0) ? (this.state.currently_grabbed[this.state.currentVideo].index-1) : (this.state.timings[this.state.currentVideo].length-1)
         this.setState({currently_grabbed: {"index": prev_idx , "type": "start"}, playing: false}, () => {
-            this.progressBar.current.style.left = `${this.state.timings[prev_idx].start / this.playVideo.current.duration * 100}%`;
+            this.progressBar.current.style.left = `${this.state.timings[this.state.currentVideo][prev_idx].start / this.playVideo.current.duration * 100}%`;
             this.progressBar.current.style.width = '0%'
-            this.playVideo.current.currentTime = this.state.timings[prev_idx].start;
+            this.playVideo.current.currentTime = this.state.timings[this.state.currentVideo][prev_idx].start;
         })
     }
 
@@ -134,7 +146,7 @@ class Editor extends React.Component {
             this.playVideo.current.pause()
         }
         else{
-            if ((self.playVideo.current.currentTime >= self.state.timings[self.state.timings.length-1].end)){
+            if ((self.playVideo.current.currentTime >= self.state.timings[this.state.currentVideo][self.state.timings.length-1].end)){
                 self.playVideo.current.pause()
                 self.setState({playing: false, currently_grabbed: {"index": 0, "type": "start"}}, () => {
                     self.playVideo.current.currentTime = self.state.timings[0].start;
@@ -345,8 +357,8 @@ class Editor extends React.Component {
                     : ""}
                 </div>
                 <div className={"videoChange"}>
-                    <FontAwesomeIcon icon={faAngleLeft} style={{float: 'left'}} className={`arrows ${this.state.currentVideo == 0 ? "hidden" : ""}`} onClick={() => {this.setState({currentVideo: this.state.currentVideo-1})}}/>
-                    <FontAwesomeIcon icon={faAngleRight} style={{float: 'right'}} className={`arrows ${this.state.currentVideo >= this.props.videoUrl.length-1 ? "hidden" : ""}`} onClick={() => {this.setState({currentVideo: this.state.currentVideo+1})}}/>
+                    <FontAwesomeIcon icon={faAngleLeft} style={{float: 'left'}} className={`arrows ${this.state.currentVideo == 0 ? "hidden" : ""}`} onClick={() => {this.setState({currentVideo: this.state.currentVideo-1, playing: false}, () => {this.renderGrabbers()}); this.playVideo.current.pause();}}/>
+                    <FontAwesomeIcon icon={faAngleRight} style={{float: 'right'}} className={`arrows ${this.state.currentVideo >= this.props.videoUrl.length-1 ? "hidden" : ""}`} onClick={() => {this.setState({currentVideo: this.state.currentVideo+1, playing: false}, () => {this.renderGrabbers()}); this.playVideo.current.pause();}}/>
                 </div>
             </div>
         )
