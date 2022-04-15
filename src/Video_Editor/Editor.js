@@ -9,7 +9,6 @@ class Editor extends React.Component {
         super(props);
         this.state = {
             isMuted: false,
-            timings: [],
             playing: false,
             currently_grabbed: {"index": 0, "type": "none"},
             difference: 0.2,
@@ -33,18 +32,18 @@ class Editor extends React.Component {
         var self = this
         this.playVideo.current.addEventListener('timeupdate', function () {
             var curr_idx = self.state.currently_grabbed.index
-            var seek = (self.playVideo.current.currentTime - self.state.timings[curr_idx].start) / self.playVideo.current.duration * 100;
+            var seek = (self.playVideo.current.currentTime - self.props.timings[curr_idx].start) / self.playVideo.current.duration * 100;
             self.progressBar.current.style.width = `${seek}%`;
-            if ((self.playVideo.current.currentTime >= self.state.timings[self.state.timings.length-1].end)){
+            if ((self.playVideo.current.currentTime >= self.props.timings[self.props.timings.length-1].end)){
                 self.playVideo.current.pause()
                 self.setState({playing: false})
             }
-            else if(self.playVideo.current.currentTime >= self.state.timings[curr_idx].end){
-                if((curr_idx+1) < self.state.timings.length){
+            else if(self.playVideo.current.currentTime >= self.props.timings[curr_idx].end){
+                if((curr_idx+1) < self.props.timings.length){
                     self.setState({currently_grabbed: {"index": curr_idx+1, "type": "start"}}, () => {
                         self.progressBar.current.style.width = '0%'
-                        self.progressBar.current.style.left = `${self.state.timings[curr_idx+1].start / self.playVideo.current.duration * 100}%`;
-                        self.playVideo.current.currentTime = self.state.timings[curr_idx+1].start;
+                        self.progressBar.current.style.left = `${self.props.timings[curr_idx+1].start / self.playVideo.current.duration * 100}%`;
+                        self.playVideo.current.currentTime = self.props.timings[curr_idx+1].start;
                     })
                 }
             }
@@ -55,12 +54,16 @@ class Editor extends React.Component {
                 self.play_pause();
             }
         });
-        var time = this.state.timings
+        var time = this.props.timings
         this.playVideo.current.onloadedmetadata = () => {
-            time.push({'start': 0, 'end': this.playVideo.current.duration})
-            this.setState({timings: time}, () => {
-                this.addActiveSegments()
-            });
+            if(time.length === 0) {
+                time.push({'start': 0, 'end': this.playVideo.current.duration})
+                this.props.updateState({timings: time}, () => {
+                    this.addActiveSegments()
+                });
+            } else {
+                this.addActiveSegments();
+            } 
         }
     }
 
@@ -68,16 +71,16 @@ class Editor extends React.Component {
         this.playVideo.current.pause()
         this.setState({
             isMuted: false,
-            timings: [{'start': 0, 'end': this.playVideo.current.duration}],
             playing: false,
             currently_grabbed: {"index": 0, "type": "none"},
             difference: 0.2,
             deletingGrabber: false,
             current_warning: null,
             imageUrl: ""
-        }, () => {
-            this.playVideo.current.currentTime = this.state.timings[0].start;
-            this.progressBar.current.style.left = `${this.state.timings[0].start / this.playVideo.current.duration * 100}%`;
+        })
+        this.props.updateState({timings: [{'start': 0, 'end': this.playVideo.current.duration}]}, () => {
+            this.playVideo.current.currentTime = this.props.timings[0].start;
+            this.progressBar.current.style.left = `${this.props.timings[0].start / this.playVideo.current.duration * 100}%`;
             this.progressBar.current.style.width = "0%";
             this.addActiveSegments();
         })
@@ -108,11 +111,11 @@ class Editor extends React.Component {
         if(this.state.playing){
             this.playVideo.current.pause()
         }
-        var prev_idx = (this.state.currently_grabbed.index != 0) ? (this.state.currently_grabbed.index-1) : (this.state.timings.length-1)
+        var prev_idx = (this.state.currently_grabbed.index != 0) ? (this.state.currently_grabbed.index-1) : (this.props.timings.length-1)
         this.setState({currently_grabbed: {"index": prev_idx , "type": "start"}, playing: false}, () => {
-            this.progressBar.current.style.left = `${this.state.timings[prev_idx].start / this.playVideo.current.duration * 100}%`;
+            this.progressBar.current.style.left = `${this.props.timings[prev_idx].start / this.playVideo.current.duration * 100}%`;
             this.progressBar.current.style.width = '0%'
-            this.playVideo.current.currentTime = this.state.timings[prev_idx].start;
+            this.playVideo.current.currentTime = this.props.timings[prev_idx].start;
         })
     }
 
@@ -122,11 +125,11 @@ class Editor extends React.Component {
             this.playVideo.current.pause()
         }
         else{
-            if ((self.playVideo.current.currentTime >= self.state.timings[self.state.timings.length-1].end)){
+            if ((self.playVideo.current.currentTime >= self.props.timings[self.props.timings.length-1].end)){
                 self.playVideo.current.pause()
                 self.setState({playing: false, currently_grabbed: {"index": 0, "type": "start"}}, () => {
-                    self.playVideo.current.currentTime = self.state.timings[0].start;
-                    self.progressBar.current.style.left = `${self.state.timings[0].start / self.playVideo.current.duration * 100}%`;
+                    self.playVideo.current.currentTime = self.props.timings[0].start;
+                    self.progressBar.current.style.left = `${self.props.timings[0].start / self.playVideo.current.duration * 100}%`;
                     self.progressBar.current.style.width = "0%";
                 })
             }
@@ -140,11 +143,11 @@ class Editor extends React.Component {
         if(this.state.playing){
             this.playVideo.current.pause()
         }
-        var next_idx = (this.state.currently_grabbed.index != (this.state.timings.length-1)) ? (this.state.currently_grabbed.index+1) : 0
+        var next_idx = (this.state.currently_grabbed.index != (this.props.timings.length-1)) ? (this.state.currently_grabbed.index+1) : 0
         this.setState({currently_grabbed: {"index": next_idx , "type": "start"}, playing: false}, () => {
-            this.progressBar.current.style.left = `${this.state.timings[next_idx].start / this.playVideo.current.duration * 100}%`;
+            this.progressBar.current.style.left = `${this.props.timings[next_idx].start / this.playVideo.current.duration * 100}%`;
             this.progressBar.current.style.width = '0%'
-            this.playVideo.current.currentTime = this.state.timings[next_idx].start;
+            this.playVideo.current.currentTime = this.props.timings[next_idx].start;
         })
     }
 
@@ -155,7 +158,7 @@ class Editor extends React.Component {
         // find where seekTime is in the segment
         var index = -1;
         var counter = 0;
-        for(let times of this.state.timings){
+        for(let times of this.props.timings){
             if(seekTime >= times.start && seekTime <= times.end){
                 index = counter;
             }
@@ -166,7 +169,7 @@ class Editor extends React.Component {
         }
         this.setState({playing: false, currently_grabbed: {"index": index, "type": "start"}}, () => {
             this.progressBar.current.style.width = '0%' // Since the width is set later, this is necessary to hide weird UI
-            this.progressBar.current.style.left = `${this.state.timings[index].start / this.playVideo.current.duration * 100}%`
+            this.progressBar.current.style.left = `${this.props.timings[index].start / this.playVideo.current.duration * 100}%`
             this.playVideo.current.currentTime = seekTime
         })
     }
@@ -178,25 +181,29 @@ class Editor extends React.Component {
         const index = this.state.currently_grabbed.index
         const type = this.state.currently_grabbed.type
         window.addEventListener("mouseup", () => {window.removeEventListener('mousemove', this.startGrabberMove); this.addActiveSegments()})
-        var time = this.state.timings
+        var time = this.props.timings
         var seek = this.playVideo.current.duration * seekRatio
         if((type == "start") && (seek > ((index != 0) ? (time[index-1].end+this.state.difference+0.2) : 0)) && seek < time[index].end-this.state.difference){
             this.progressBar.current.style.left = `${seekRatio*100}%`
             this.playVideo.current.currentTime = seek
             time[index]["start"] = seek
-            this.setState({timings: time, playing: false})
+            this.setState({playing: false})
+            this.props.updateState({timings: time})
         }
-        else if((type == "end") && (seek > time[index].start+this.state.difference) && (seek < (index != (this.state.timings.length-1) ? time[index+1].start-this.state.difference-0.2 : this.playVideo.current.duration))){
+        else if((type == "end") && (seek > time[index].start+this.state.difference) && (seek < (index != (this.props.timings.length-1) ? time[index+1].start-this.state.difference-0.2 : this.playVideo.current.duration))){
             this.progressBar.current.style.left = `${time[index].start / this.playVideo.current.duration * 100}%`
             this.playVideo.current.currentTime = time[index].start
             time[index]["end"] = seek
-            this.setState({timings: time, playing: false})
+            this.setState({playing: false})
+            this.props.updateState({timings: time})
         }
         this.progressBar.current.style.width = "0%"
     }
 
     renderGrabbers = () => {
-        return this.state.timings.map((x, index) => (
+        if(!this.playVideo.current)
+            return [];
+        return this.props.timings.map((x, index) => (
             <div key={"grabber_"+index}>
                 <div className="grabber start" style={{left: `${x.start / this.playVideo.current.duration * 100}%`}} onMouseDown={(event) => {
                     if(this.state.deletingGrabber){
@@ -232,14 +239,14 @@ class Editor extends React.Component {
     }
 
     addGrabber = () => {
-        var time = this.state.timings
+        var time = this.props.timings
         var end = time[time.length-1].end+this.state.difference
         this.setState({deletingGrabber: false, current_warning: null})
         if(end >= this.playVideo.current.duration){
             return
         }
         time.push({"start": end+0.2, "end": this.playVideo.current.duration})
-        this.setState({timings: time}, () => {
+        this.props.updateState({timings: time}, () => {
             this.addActiveSegments()
         })
     }
@@ -254,8 +261,9 @@ class Editor extends React.Component {
     }
 
     deleteGrabber = (index) => {
-        var time = this.state.timings
-        this.setState({timings: time, deletingGrabber: false, current_warning: null, currently_grabbed: {"index": 0, "type": "start"}})
+        var time = this.props.timings
+        this.setState({deletingGrabber: false, current_warning: null, currently_grabbed: {"index": 0, "type": "start"}})
+        this.props.updateState({deletingGrabber: false, current_warning: null, currently_grabbed: {"index": 0, "type": "start"}})
         if(time.length == 1){
             return
         }
@@ -269,21 +277,21 @@ class Editor extends React.Component {
     addActiveSegments = () => {
         var colors = ""
         var counter = 0
-        colors += `, rgb(240, 240, 240) 0%, rgb(240, 240, 240) ${this.state.timings[0].start / this.playVideo.current.duration * 100}%`
-        for(let times of this.state.timings){
+        colors += `, rgb(240, 240, 240) 0%, rgb(240, 240, 240) ${this.props.timings[0].start / this.playVideo.current.duration * 100}%`
+        for(let times of this.props.timings){
             if(counter > 0){
-                colors += `, rgb(240, 240, 240) ${this.state.timings[counter-1].end / this.playVideo.current.duration * 100}%, rgb(240, 240, 240) ${times.start / this.playVideo.current.duration * 100}%`
+                colors += `, rgb(240, 240, 240) ${this.props.timings[counter-1].end / this.playVideo.current.duration * 100}%, rgb(240, 240, 240) ${times.start / this.playVideo.current.duration * 100}%`
             }
             colors += `, #ccc ${times.start / this.playVideo.current.duration * 100}%, #ccc ${times.end / this.playVideo.current.duration * 100}%`
             counter += 1
         }
-        colors += `, rgb(240, 240, 240) ${this.state.timings[counter-1].end / this.playVideo.current.duration * 100}%, rgb(240, 240, 240) 100%`
+        colors += `, rgb(240, 240, 240) ${this.props.timings[counter-1].end / this.playVideo.current.duration * 100}%, rgb(240, 240, 240) 100%`
         this.playBackBar.current.style.background = `linear-gradient(to right${colors})`;
     }
 
     saveVideo = () => {
         var metadata = {
-            "trim_times": this.state.timings,
+            "trim_times": this.props.timings,
             "mute": this.state.isMuted
         }
         this.props.saveVideo(metadata)
