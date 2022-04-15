@@ -12,6 +12,7 @@ class VideoEditor extends React.Component {
             isUpload: true,
             videoUrl: "",
             isDarkMode: false,
+            timings: []
         }
     }
 
@@ -52,7 +53,9 @@ class VideoEditor extends React.Component {
             // Props:
             // videoUrl --> URL of uploaded video
             // saveVideo(<metadata of edited video>) --> gives the cut times and if video is muted or not
-            <Editor videoUrl={this.state.videoUrl} saveVideo={this.saveVideo}/>
+            <Editor videoUrl={this.state.videoUrl} saveVideo={this.saveVideo}
+                    timings={this.state.timings} 
+                    updateState={(st,cb) => this.setState(st, cb)}/>
         )
     }
 
