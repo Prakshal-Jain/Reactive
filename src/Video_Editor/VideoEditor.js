@@ -12,7 +12,7 @@ class VideoEditor extends React.Component {
             isUpload: true,
             videoUrl: "",
             isDarkMode: false,
-            timings: []
+            timings: [{start: 0, end: 319}]
         }
     }
 

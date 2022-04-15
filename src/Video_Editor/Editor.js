@@ -197,6 +197,8 @@ class Editor extends React.Component {
     }
 
     renderGrabbers = () => {
+        if(!this.playVideo.current)
+            return [];
         return this.props.timings.map((x, index) => (
             <div key={"grabber_"+index}>
                 <div className="grabber start" style={{left: `${x.start / this.playVideo.current.duration * 100}%`}} onMouseDown={(event) => {
