@@ -56,10 +56,14 @@ class Editor extends React.Component {
         });
         var time = this.props.timings
         this.playVideo.current.onloadedmetadata = () => {
-            time.push({'start': 0, 'end': this.playVideo.current.duration})
-            this.props.updateState({timings: time}, () => {
-                this.addActiveSegments()
-            });
+            if(time.length === 0) {
+                time.push({'start': 0, 'end': this.playVideo.current.duration})
+                this.props.updateState({timings: time}, () => {
+                    this.addActiveSegments()
+                });
+            } else {
+                this.addActiveSegments();
+            } 
         }
     }
 
