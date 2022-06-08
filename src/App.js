@@ -1,9 +1,10 @@
-import Editor from './Video_Editor/VideoEditor'
+import './App.css';
+import VideoEditor from './VideoEditor/VideoEditor'
 
 function App() {
   return (
     <div className="App">
-      <Editor />
+     <VideoEditor />
     </div>
   );
 }
