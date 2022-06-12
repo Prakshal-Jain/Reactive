@@ -54,9 +54,7 @@ function Editor({videoUrl, timings, setTimings}) {
 	//Lifecycle handling the logic needed for the progress bar - displays the blue bar that grows as the video plays
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
-		console.log(videoUrl)
 		if(playVideoRef.current.onloadedmetadata) {
-			console.log(timings)
 			const currentIndex = currentlyGrabbedRef.current.index
 			const seek = (playVideoRef.current.currentTime - timings[0].start) / playVideoRef.current.duration * 100
 			setSeekerBar(seek)
