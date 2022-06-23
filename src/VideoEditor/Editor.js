@@ -4,6 +4,8 @@ import '../editor.css'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome' // https://fontawesome.com/v5/docs/web/use-with/react
 import {faVolumeMute, faVolumeUp, faPause, faPlay, faGripLinesVertical, faSync, faStepBackward, faStepForward, faCamera, faDownload, faEraser} from '@fortawesome/free-solid-svg-icons' // https://fontawesome.com/v5/docs/web/use-with/react
 
+import {createFFmpeg, fetchFile} from '@ffmpeg/ffmpeg' // https://github.com/ffmpegwasm/ffmpeg.wasm/blob/master/docs/api.md
+
 
 function Editor({videoUrl, timings, setTimings}) {
 
@@ -49,6 +51,41 @@ function Editor({videoUrl, timings, setTimings}) {
 
 	//Variable for error handling on the delete grabber functionality
 	const warnings = {'delete_grabber': (<div>Please click on the grabber (either start or end) to delete it</div>)}
+
+	//State handling storing of the trimmed video
+	const [trimmedVideo, setTrimmedVideo] = useState()
+
+	//Integer state to handle the progress bars numerical incremation
+	const [progress, setProgress] = useState(0)
+
+	//Boolean state handling whether ffmpeg has loaded or not
+	const [ready, setReady] = useState(false)
+
+	//Ref to handle the current instance of ffmpeg when loaded
+	const ffmpeg = useRef(null)
+
+
+	//Function handling loading in ffmpeg
+	const load = async () => {
+		try{
+			await ffmpeg.current.load()
+
+			setReady(true)
+		}
+		catch(error) {
+			console.log(error)
+		}
+	}
+
+	//Loading in ffmpeg when this component renders
+	useEffect(() => {
+		ffmpeg.current = createFFmpeg({
+			log: true,
+			corePath: 'https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js'
+		})
+		load()
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 
 	//Lifecycle handling the logic needed for the progress bar - displays the blue bar that grows as the video plays
@@ -303,7 +340,7 @@ function Editor({videoUrl, timings, setTimings}) {
 		playBackBarRef.current.style.background = `linear-gradient(to right${colors})`
 	}
 
-	// Function handling logic for post trimed video
+	// Function handling logic for post trimmed video
 	const saveVideo = async(fileInput) => {
 		let metadata = {
 			'trim_times': timings,
@@ -313,27 +350,65 @@ function Editor({videoUrl, timings, setTimings}) {
 		const trimStart = metadata.trim_times[0].start
 		const trimEnd = metadata.trim_times[0].end
 
-		// const vidDuration = await getBlobDuration(blobUrl)
 		const trimmedVideo = trimEnd - trimStart
-		setTrimmingDone(true)
+
 		console.log('Trimmed Duration: ', trimmedVideo)
-		trimmedVidRef.current.duration = trimmedVideo
-		// if(trimEnd - trimStart < trimmedVidRef.current.duration) {
-		// }
+		console.log('Trim End: ', trimEnd)
+
+		try{
+			//Disabling new-cap for FS function
+			// eslint-disable-next-line new-cap
+			ffmpeg.current.FS('writeFile', 'myFile.mp4', await fetchFile(videoUrl))
+
+			ffmpeg.current.setProgress(({ratio}) => {
+				console.log('ffmpeg progress: ', ratio)
+				if(ratio < 0) {
+					setProgress(0)
+				}
+				setProgress(Math.round(ratio * 100))
+			})
+
+			await ffmpeg.current.run('-ss', `${trimStart}`, '-accurate_seek', '-i', 'myFile.mp4', '-to', `${trimmedVideo}`, '-codec', 'copy', 'output.mp4')
+
+			//Disabling new-cap for FS function
+			// eslint-disable-next-line new-cap
+			const data = ffmpeg.current.FS('readFile', 'output.mp4')
+
+			const url = URL.createObjectURL(new Blob([data.buffer], {type: 'video/mp4'}))
+
+			setTrimmedVideo(url)
+			setTrimmingDone(true)
+			// setLottiePlaying(false)
+		}
+		catch(error) {
+			console.log(error)
+		}
 	}
 
 	return (
 		<div className='wrapper'>
 			{/* Video element for the trimmed video */}
 			{trimmingDone ?
-				<video style={{width: '25vw'}}
-					ref={trimmedVidRef}
-					controls
-					autoload='metadata'
-					onClick={() => console.log(trimmedVidRef.current.duration)}
-				>
-					<source src={videoUrl}/>
-				</video>
+				<div
+					style={{
+						maxHeight: '100vh',
+						marginTop: '50vh'
+					}}>
+					<video
+						style={{
+							width: '100%',
+							marginTop: '100px',
+							borderRadius: '20px',
+							border: '4px solid #0072cf'
+						}}
+						ref={trimmedVidRef}
+						controls
+						autoload='metadata'
+						onClick={() => console.log(trimmedVidRef.current.duration)}
+					>
+						<source src={trimmedVideo} type='video/mp4' />
+					</video>
+				</div>
 				: null
 			}
 			{/* Main video element for the video editor */}
@@ -446,6 +521,11 @@ function Editor({videoUrl, timings, setTimings}) {
 					<button title='Save changes' className='trim-control' onClick={saveVideo}>Save</button>
 				</div>
 			</div>
+			{ready ?
+				<div></div>
+				:
+				<div>Loading...</div>
+			}
 			{currentWarning != null ? <div className={'warning'}>{warnings[currentWarning]}</div> : ''}
 			{(imageUrl !== '') ?
 				<div className={'marginVertical'}>
