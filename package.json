@@ -1,28 +1,53 @@
 {
-  "name": "reactive",
-  "version": "1.0.2",
-  "private": false,
+  "name": "reactive-collab",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
+    "@emotion/react": "^11.8.1",
+    "@emotion/styled": "^11.8.1",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffmpeg/core": "^0.10.0",
+    "@ffmpeg/ffmpeg": "^0.10.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
+    "@material-ui/core": "^4.12.3",
+    "@mui/material": "^5.4.3",
+    "@mui/styles": "^5.4.2",
+    "@reduxjs/toolkit": "^1.6.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "body-parser": "^1.20.0",
+    "browserify": "^17.0.0",
+    "coi-serviceworker": "^0.1.6",
+    "debounce": "^1.2.1",
+    "eslint": "^8.15.0",
+    "ffmpeg-on-progress": "^1.0.0",
+    "ffmpeg-progress-wrapper": "^2.0.1",
     "gh-pages": "^3.2.3",
+    "inobounce": "^0.2.0",
+    "js": "^0.1.0",
+    "lodash.debounce": "^4.0.8",
+    "lottie-web": "^5.9.4",
+    "node": "^17.7.2",
+    "progress-bar-react-ui": "^1.0.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-file-drop": "^3.1.2",
-    "react-scripts": "4.0.3",
+    "react-file-drop": "^3.1.5",
+    "react-scripts": "^5.0.1",
+    "react-video-editor": "^1.0.2",
+    "shaneFFMPEG": "git+https://github.com/Shane-Geary/shaneFFMPEG.git",
+    "styled-components": "^5.3.5",
+    "tss-react": "^3.4.1",
+    "use-debounce": "^7.0.1",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -41,37 +66,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "description": "Reactive is a react based in-browser video editor made with the mission to build the simplest yet powerful video editing software.",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Prakshal-Jain/Reactive.git"
-  },
-  "keywords": [
-    "React",
-    "video",
-    "editor",
-    "react",
-    "video",
-    "editor",
-    "media",
-    "editor",
-    "prakshal",
-    "jain",
-    "memoryfox",
-    "upload",
-    "youtube",
-    "vid",
-    "edit",
-    "crop",
-    "merge",
-    "how"
-  ],
-  "author": "Prakshal Jain",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Prakshal-Jain/Reactive/issues"
-  },
-  "homepage": "https://prakshal-jain.github.io/Reactive/"
+  }
 }

@@ -1,6 +1,6 @@
 {
-  "short_name": "Reactive",
-  "name": "The simplest in-browser video editor",
+  "short_name": "React App",
+  "name": "Create React App Sample",
   "icons": [
     {
       "src": "favicon.ico",
