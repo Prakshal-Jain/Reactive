@@ -1,46 +1,34 @@
-# Getting Started with Create React App
+<center><img src="./images/Reactive.png" style="width: 30%; height: auto"/></center>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Reactive: React Video Editor
+Reactive is a react based video editor made with the mission to build the simplest yet powerful video editing software. So, buckle up & let's get started!
 
-## Available Scripts
+## Demo
+1. Enjoy reactive here: https://prakshal-jain.github.io/Reactive/
+2. To try & tweak source code instantly, visit: https://codesandbox.io/s/reactive-e8suc
 
-In the project directory, you can run:
+## Install NPM package:
+To install reactive NPM package, run ```npm i react-video-editor```
+URL: https://www.npmjs.com/package/react-video-editor
 
-### `npm start`
+## Getting started:
+1. Please make sure you have npm installed
+2. Clone the repository, and run ```npm install```. This downloads all the dependencies required.
+3. Now, it's the time to fire up our server 🚀. Run ```npm start``` to do so.
+4. <strong>Congratulations!</strong> You are all set to experience the simplicity of the great in-browser video editing software!
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## How reactive is Reactive?
+1. Drag and drop your videos to edit.
+<div>
+<img src="./images/drag&drop.png" style="width: 20%; height: auto"/>
+</div>
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+2. Edit based on your mood: Light & Dark themes makes reactive even more user friendly.
+<div>
+<img src="./images/dark.png" style="width: 20%; height: auto"/>
+</div>
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. Edit seamlessly
+<div>
+<img src="./images/editor.png" style="width: 20%; height: auto"/>
+</div>
