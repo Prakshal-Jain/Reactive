@@ -1,0 +1,2 @@
+Add waveform data for audio manipulation
+- https://www.npmjs.com/package/waveform-data

@@ -1,0 +1,117 @@
+.video-element {
+    border-radius: 15px;
+    border: 0.15rem solid rgb(91, 91, 97);
+    cursor: pointer;
+}
+
+.portrait {
+    height: 65vh;
+    width: auto;
+}
+
+.landscape {
+    width: 65vw;
+    height: auto;
+}
+
+.video-editor-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+/* ============ Controls Buttons ============ */
+.controls {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.controls > .controls-group {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.controls > .controls-group > .control-btn {
+    background-color: #2f3b44;
+    border: 0;
+    color: #bac3c7;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: large;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: background-color 0.3s ease;
+}
+
+.controls > .controls-group > .control-btn:hover {
+    background-color: #3a4853;
+    transition: background-color 0.3s ease;
+}
+
+.control-icon{
+    width: 1.4rem;
+    height: 1.4rem;
+}
+/* ================================ */
+
+/* ============ Progressbar ============ */
+.progressbar-container {
+    position: relative;
+    width: 100%;
+}
+
+.progressbar-container > .progressbar-base {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgb(240, 240, 240);
+    cursor: pointer;
+    height: 10px;
+    border-radius: 5px;
+    border: 0.1rem solid rgb(91, 91, 97);
+}
+
+.progressbar-container > .progress {
+    background: #0072cf;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+.seektime {
+    position: absolute;
+    z-index: 2px;
+    bottom: 4px;
+    color: rgb(28, 28, 30);
+    padding: 2px 0.5rem;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.6);
+    font-size: small;
+}
+/* ================================ */
+
+@media only screen and (max-width: 600px) {
+    .portrait {
+        height: 75vh;
+        width: auto;
+    }
+
+    .landscape {
+        width: 90vw;
+        height: auto;
+    }
+}

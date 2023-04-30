@@ -1,0 +1,66 @@
+.page-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-editor-container{
+  display: flex;
+  flex-grow: 1;
+  margin: 2rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.light-theme-bg {
+  background-color: rgb(220, 209, 248);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  color: rgb(28, 28, 30);
+}
+
+.dark-theme-bg {
+  background-color: rgb(28, 28, 30);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  color:rgb(242, 242, 247);
+}
+
+.auto-theme-bg {
+  background-color: rgb(242, 242, 247);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.footer-container {
+  margin: 2rem;
+  padding: 0.5rem;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  backdrop-filter: blur(0.5em);
+  color: rgba(242, 242, 247);
+}
+
+.dark-footer {
+  background-color: #28282b;
+  border: 0.1rem solid rgba(242, 242, 247, 0.3);
+}
+
+.light-footer {
+  background-color: rgb(142, 142, 147);
+  border: 0.1rem solid rgba(119, 119, 119, 0.3);
+}
+
+.footer-container > div {
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.footer-container > div:hover {
+  background-color: rgba(28, 28, 30, 0.4);
+  transition: background-color 0.3s ease;
+}

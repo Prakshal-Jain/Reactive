@@ -1,0 +1,115 @@
+.uploader-preview-box{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.uploader-container {
+    width: 60vw;
+    padding: 1rem;
+    border-radius: 4px;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.preview-container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.hidden {
+    display: none;
+}
+
+.file-drop {
+    width: 100%;
+    height: fit-content;
+    font-weight: bold;
+    font-size: large;
+}
+
+.file-drop > .file-drop-target {
+    transition: border-color 0.3s ease;
+    border: 0.2em solid rgb(255, 45, 85);
+    border-radius: 1em;
+    text-align: center;
+    padding: 8em 0em;
+    cursor: pointer;
+    transition: border 0.3s ease, transform 0.5s ease;
+}
+
+.file-drop > .file-drop-target.file-drop-dragging-over-target {
+    border: 0.2em solid rgb(40, 205, 65);
+    transition: border 0.3s ease, transform 0.5s ease;
+    transform: scale(1.1);
+    color: #cacaca;
+}
+
+.start-editing-button{
+    background-color: rgb(10, 132, 255);
+    border: none;
+    color: white;
+    border-radius: 10px;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    align-self: center;
+    font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.start-editing-button:hover{
+    background-color: rgb(9, 110, 211);
+    transition: background-color 0.3s ease;
+}
+
+.preview-image{
+    width: 120px;
+    height: 120px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 0.1rem solid rgba(255, 45, 85);
+}
+
+.video-placeholder{
+    border-radius: 3px;
+    margin-top: 0.5rem;
+}
+
+.remove-icon{
+    text-align: end;
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    width: 18px;
+    height: 18px;
+    background-color: rgba(255, 45, 85);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    padding: 0.2rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.remove-icon:hover{
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+}
