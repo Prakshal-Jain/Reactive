@@ -5,17 +5,20 @@ import { useState } from 'react';
 import { useRef } from 'react';
 import "./editor.css";
 import { useEffect } from 'react';
+import PreviewGallery from '../components/PreviewGallery';
 
 type Props = {
     sourceURLs: Array<string>,
-    videoThumbnails: Array<{ thumbnail: string, name: string } | null>,
+    videoThumbnails: Array<{ thumbnail: string, name: string, type: string } | null>,
+    setVideoThumbnails: (setSourceUrls: Array<{ thumbnail: string, name: string, type: string } | null>) => void,
     removeVideo: (index: number) => void,
     currUrlIdx: number,
+    setSourceUrls: (setSourceUrls: Array<string>) => void,
 }
 
 var throttle = require('lodash/throttle');
 
-export default function ({ sourceURLs, videoThumbnails, removeVideo, currUrlIdx }: Props) {
+export default function ({ sourceURLs, videoThumbnails, removeVideo, currUrlIdx, setSourceUrls, setVideoThumbnails }: Props) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const playBackBarRef = useRef<HTMLDivElement>(null);
     const progressBarRef = useRef<HTMLDivElement>(null);
@@ -45,10 +48,19 @@ export default function ({ sourceURLs, videoThumbnails, removeVideo, currUrlIdx 
         return formattedDuration;
     }
 
+    const getSeekTimeFromOffset = (offset: number) => {
+        if (playBackBarRef?.current && videoRef?.current) {
+            const playbackRect: DOMRect = playBackBarRef.current.getBoundingClientRect();
+            const seekTime = ((offset - playbackRect.left) / playbackRect.width) * videoRef.current.duration;
+            return seekTime;
+        }
+        return 0;
+    }
+
     const displayVideoSeekTime = throttle((offset: number) => {
         if (playBackBarRef?.current && videoRef?.current) {
-            const playbackRect: DOMRect = playBackBarRef.current.getBoundingClientRect()
-            const seekTime = ((offset - playbackRect.left) / playbackRect.width) * videoRef.current.duration
+            const playbackRect: DOMRect = playBackBarRef.current.getBoundingClientRect();
+            const seekTime = ((offset - playbackRect.left) / playbackRect.width) * videoRef.current.duration;
             const time = getVideoDuration(seekTime);
             setSeekTime({ time, offset: (offset - playbackRect.left) - 35 });
         }
@@ -62,6 +74,12 @@ export default function ({ sourceURLs, videoThumbnails, removeVideo, currUrlIdx 
             videoRef?.current?.play();
         }
         setIsPlaying(!isPlaying);
+    }
+
+    const updateProgress = (offset: number) => {
+        const seekTime = getSeekTimeFromOffset(offset);
+        videoRef?.current?.pause();
+        setIsPlaying(false);
     }
 
     return (
@@ -87,12 +105,11 @@ export default function ({ sourceURLs, videoThumbnails, removeVideo, currUrlIdx 
                 <div
                     className='progressbar-base'
                     ref={playBackBarRef}
-                    onClick={() => {/* Update Progress here */ }}
+                    onClick={(event) => updateProgress(event.clientX)}
                     onMouseEnter={() => { setSeekTime(null); }}
                     onMouseMove={(event) => displayVideoSeekTime(event.clientX)}
                     onMouseLeave={() => { setSeekTime(null); displayVideoSeekTime.cancel() }}
                 />
-                <div className='progress' ref={progressBarRef}></div>
             </div>
 
             <div className='controls'>
@@ -103,6 +120,14 @@ export default function ({ sourceURLs, videoThumbnails, removeVideo, currUrlIdx 
                     <button className='control-btn' title='Play/Pause Video' onClick={setPlayPause}>{isPlaying ? <FontAwesomeIcon icon={faPause} className='control-icon' /> : <FontAwesomeIcon icon={faPlay} className='control-icon' />}</button>
                 </div>
             </div>
+
+            <PreviewGallery
+                videoThumbnails={videoThumbnails}
+                removeVideo={removeVideo}
+                sourceURLs={sourceURLs}
+                setSourceUrls={setSourceUrls}
+                setVideoThumbnails={setVideoThumbnails}
+            />
         </div>
     )
 }

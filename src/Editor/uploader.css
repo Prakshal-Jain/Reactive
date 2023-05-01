@@ -19,14 +19,6 @@
     gap: 2rem;
 }
 
-.preview-container{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-}
-
 .hidden {
     display: none;
 }
@@ -78,38 +70,4 @@
 .start-editing-button:hover{
     background-color: rgb(9, 110, 211);
     transition: background-color 0.3s ease;
-}
-
-.preview-image{
-    width: 120px;
-    height: 120px;
-    border-radius: 10px;
-    object-fit: cover;
-    border: 0.1rem solid rgba(255, 45, 85);
-}
-
-.video-placeholder{
-    border-radius: 3px;
-    margin-top: 0.5rem;
-}
-
-.remove-icon{
-    text-align: end;
-    position: absolute;
-    right: -10px;
-    top: -10px;
-    width: 18px;
-    height: 18px;
-    background-color: rgba(255, 45, 85);
-    border-radius: 50px;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    padding: 0.2rem;
-    font-weight: bold;
-    color: #fff;
-}
-
-.remove-icon:hover{
-    transform: scale(1.2);
-    transition: transform 0.3s ease;
 }

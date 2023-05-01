@@ -1,12 +1,12 @@
 import { faAngleRight, faRemove, faSmile, faSmileWink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import * as React from 'react';
 import { useRef } from 'react';
 import { useEffect } from 'react';
 import { FileDrop } from 'react-file-drop'
 import './uploader.css';
 import { generateVideoThumbnails } from '@rajesh896/video-thumbnails-generator';
 import { Shimmer } from 'react-shimmer';
+import PreviewGallery from '../components/PreviewGallery';
 
 type Props = {
     sourceURLs: Array<string>,
@@ -32,10 +32,11 @@ export default function ({ sourceURLs, setSourceUrls, videoThumbnails, setVideoT
 
         const thumbnails: Array<{ thumbnail: string, name: string, type: string } | null> = Array(allFiles.length).fill(null);
         const toUpload: Array<string> = allFiles.map((v, i) => {
-            const url: string = URL.createObjectURL(v)
+            const url: string = URL.createObjectURL(v);
 
             return url;
-        })
+        });
+        
         setSourceUrls([...sourceURLs, ...toUpload]);
         setVideoThumbnails([...videoThumbnails, ...thumbnails]);
 
@@ -75,32 +76,7 @@ export default function ({ sourceURLs, setSourceUrls, videoThumbnails, setVideoT
                 </FileDrop>
             </div>
 
-            {(videoThumbnails?.length > 0) && (
-                <div className="preview-container">
-                    {videoThumbnails.map((metadata, index) => (
-                        <div style={{ position: 'relative' }}>
-                            <FontAwesomeIcon icon={faRemove} className="remove-icon" onClick={() => removeVideo(index)} />
-                            {(metadata?.thumbnail !== null && metadata?.thumbnail !== undefined) ? (
-                                <img src={metadata?.thumbnail} className="preview-image" />
-                            )
-                                :
-                                <div>
-                                    <Shimmer width={120} height={120} className='preview-image' />
-                                </div>
-                            }
-
-                            {(metadata?.name !== null && metadata?.name !== undefined) ? (
-                                <div style={{ fontSize: 'small', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: 100, textAlign: 'center', marginTop: '0.5rem' }}>
-                                    {metadata?.name}
-                                </div>
-                            )
-                                :
-                                <Shimmer width={120} height={10} className='video-placeholder' />
-                            }
-                        </div>
-                    ))}
-                </div>
-            )}
+            <PreviewGallery videoThumbnails={videoThumbnails} removeVideo={removeVideo} sourceURLs={sourceURLs} setSourceUrls={setSourceUrls} setVideoThumbnails={setVideoThumbnails} />
 
             {(sourceURLs?.length > 0) && (
                 <button className="start-editing-button" onClick={() => setShowEditor(true)}>

@@ -11,16 +11,27 @@ function App() {
   const [showEditor, setShowEditor] = useState<boolean>(false);
   const [sourceURLs, setSourceUrls] = useState<Array<string>>([]);
   const [videoThumbnails, setVideoThumbnails] = useState<Array<{ thumbnail: string, name: string, type: string } | null>>([]);
-  const [currUrlIdx] = useState<number>(0);
+  const [currUrlIdx, setCurrUrlidx] = useState<number>(0);
 
   const removeVideo = (index: number) => {
-    const urls = [...sourceURLs];
-    urls.splice(index, 1);
-    setSourceUrls(urls);
+    if (sourceURLs.length === 0) {
+      return;
+    }
+    if (sourceURLs.length === 1) {
+      setSourceUrls([]);
+      setVideoThumbnails([]);
+      setCurrUrlidx(0);
+      setShowEditor(false);
+    }
+    else {
+      const urls = [...sourceURLs];
+      urls.splice(index, 1);
+      setSourceUrls(urls);
 
-    const thumbnails = [...videoThumbnails];
-    thumbnails.splice(index, 1);
-    setVideoThumbnails(thumbnails);
+      const thumbnails = [...videoThumbnails];
+      thumbnails.splice(index, 1);
+      setVideoThumbnails(thumbnails);
+    }
   }
 
   return (
@@ -33,6 +44,8 @@ function App() {
             videoThumbnails={videoThumbnails}
             removeVideo={removeVideo}
             currUrlIdx={currUrlIdx}
+            setSourceUrls={setSourceUrls}
+            setVideoThumbnails={setVideoThumbnails}
           />
           :
           <Uploader
