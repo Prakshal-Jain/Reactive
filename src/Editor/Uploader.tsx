@@ -7,6 +7,8 @@ import './uploader.css';
 import { generateVideoThumbnails } from '@rajesh896/video-thumbnails-generator';
 import { Shimmer } from 'react-shimmer';
 import PreviewGallery from '../components/PreviewGallery';
+import { useContext } from 'react';
+import { StateContext } from '../state_context';
 
 type Props = {
     sourceURLs: Array<string>,
@@ -15,10 +17,20 @@ type Props = {
     setVideoThumbnails: (setSourceUrls: Array<{ thumbnail: string, name: string, type: string } | null>) => void,
     removeVideo: (index: number) => void,
     setShowEditor: (setShowEditor: boolean) => void,
+    currUrlIdx: number,
+    setCurrUrlidx: (idx: number) => void,
 }
 
-export default function ({ sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, removeVideo, setShowEditor }: Props) {
+export default function () {
     const fileinputRef = useRef<HTMLInputElement>(null);
+
+    const ctx = useContext(StateContext);
+
+    if(ctx === null || ctx === undefined){
+        return null;
+    }
+
+    const { sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, removeVideo, setShowEditor, currUrlIdx, setCurrUrlidx }: Props = ctx;
 
     useEffect(() => {
         document.addEventListener('drop', function (e) {
@@ -76,7 +88,7 @@ export default function ({ sourceURLs, setSourceUrls, videoThumbnails, setVideoT
                 </FileDrop>
             </div>
 
-            <PreviewGallery videoThumbnails={videoThumbnails} removeVideo={removeVideo} sourceURLs={sourceURLs} setSourceUrls={setSourceUrls} setVideoThumbnails={setVideoThumbnails} />
+            <PreviewGallery />
 
             {(sourceURLs?.length > 0) && (
                 <button className="start-editing-button" onClick={() => setShowEditor(true)}>

@@ -5,6 +5,7 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import './App.css';
 import Uploader from './Editor/Uploader';
 import Editor from './Editor/Editor';
+import { StateContext } from './state_context';
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
@@ -35,53 +36,42 @@ function App() {
   }
 
   return (
-    <div className={`${theme}-theme-bg page-container`}>
-      <div className="video-editor-container">
-        {/* Add editor here */}
-        {showEditor ?
-          <Editor
-            sourceURLs={sourceURLs}
-            videoThumbnails={videoThumbnails}
-            removeVideo={removeVideo}
-            currUrlIdx={currUrlIdx}
-            setSourceUrls={setSourceUrls}
-            setVideoThumbnails={setVideoThumbnails}
-          />
-          :
-          <Uploader
-            sourceURLs={sourceURLs}
-            setSourceUrls={setSourceUrls}
-            videoThumbnails={videoThumbnails}
-            setVideoThumbnails={setVideoThumbnails}
-            removeVideo={removeVideo}
-            setShowEditor={setShowEditor}
-          />}
-      </div>
+    <StateContext.Provider value={{ theme, setTheme, showEditor, setShowEditor, sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, currUrlIdx, setCurrUrlidx, removeVideo }} >
+      <div className={`${theme}-theme-bg page-container`}>
+        <div className="video-editor-container">
+          {/* Add editor here */}
+          {showEditor ?
+            <Editor />
+            :
+            <Uploader />
+          }
+        </div>
 
-      <div className={`footer-container ${theme === 'dark' ? 'dark-footer' : 'light-footer'}`}>
-        <div className={`hover-bg-${theme}`}
-          onClick={() => {
-            setTheme(theme === 'dark' ? 'light' : 'dark');
-          }}
-          title="Switch light and dark themes"
-        >
-          <FontAwesomeIcon icon={theme === 'light' ? faLightbulb : faMoon} style={{ color: 'rgb(255, 204, 0)', width: '1.5rem', height: '1.5rem' }}
-          />
-        </div>
-        <div title="Add closed captions">
-          <FontAwesomeIcon icon={faClosedCaptioning} style={{ color: '#fff', width: '1.5rem', height: '1.5rem' }} />
-        </div>
-        <div title="Video language translation">
-          <FontAwesomeIcon icon={faLanguage} style={{ color: '#fff', width: '1.5rem', height: '1.5rem' }} />
-        </div>
-        <div title="Video filters">
-          <FontAwesomeIcon icon={faPhotoVideo} style={{ color: '#fff', width: '1.5rem', height: '1.5rem' }} />
-        </div>
-        <div title="Github repository" onClick={() => window.open('https://github.com/Prakshal-Jain/Reactive', '_blank')}>
-          <FontAwesomeIcon icon={faGithub} style={{ color: '#fff', width: '1.5rem', height: '1.5rem' }} />
+        <div className={`footer-container ${theme === 'dark' ? 'dark-footer' : 'light-footer'}`}>
+          <div className={`hover-bg-${theme}`}
+            onClick={() => {
+              setTheme(theme === 'dark' ? 'light' : 'dark');
+            }}
+            title="Switch light and dark themes"
+          >
+            <FontAwesomeIcon icon={theme === 'light' ? faLightbulb : faMoon} style={{ color: 'rgb(255, 204, 0)', width: '1.5rem', height: '1.5rem' }}
+            />
+          </div>
+          <div title="Add closed captions">
+            <FontAwesomeIcon icon={faClosedCaptioning} style={{ color: '#fff', width: '1.5rem', height: '1.5rem' }} />
+          </div>
+          <div title="Video language translation">
+            <FontAwesomeIcon icon={faLanguage} style={{ color: '#fff', width: '1.5rem', height: '1.5rem' }} />
+          </div>
+          <div title="Video filters">
+            <FontAwesomeIcon icon={faPhotoVideo} style={{ color: '#fff', width: '1.5rem', height: '1.5rem' }} />
+          </div>
+          <div title="Github repository" onClick={() => window.open('https://github.com/Prakshal-Jain/Reactive', '_blank')}>
+            <FontAwesomeIcon icon={faGithub} style={{ color: '#fff', width: '1.5rem', height: '1.5rem' }} />
+          </div>
         </div>
       </div>
-    </div>
+    </StateContext.Provider>
   );
 }
 

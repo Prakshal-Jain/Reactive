@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Shimmer } from "react-shimmer";
 import { generateVideoThumbnails } from '@rajesh896/video-thumbnails-generator';
 import "./previewgallery.css";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
+import { StateContext } from "../state_context";
 
 type Props = {
     videoThumbnails: Array<{ thumbnail: string, name: string, type: string } | null>,
@@ -11,10 +12,20 @@ type Props = {
     removeVideo: (index: number) => void,
     sourceURLs: Array<string>,
     setSourceUrls: (setSourceUrls: Array<string>) => void,
+    currUrlIdx: number,
+    setCurrUrlidx: (idx: number) => void,
 }
 
-export default function ({ videoThumbnails, removeVideo, sourceURLs, setSourceUrls, setVideoThumbnails }: Props) {
+export default function () {
     const fileinputRef = useRef<HTMLInputElement>(null);
+
+    const ctx = useContext(StateContext);
+
+    if (ctx === null || ctx === undefined) {
+        return null;
+    }
+
+    const { videoThumbnails, removeVideo, sourceURLs, setSourceUrls, setVideoThumbnails, currUrlIdx, setCurrUrlidx }: Props = ctx;
 
     const addNewVideo = async (files: (FileList | null)) => {
         if (files === null) {
@@ -25,6 +36,7 @@ export default function ({ videoThumbnails, removeVideo, sourceURLs, setSourceUr
         const url = URL.createObjectURL(file);
         setSourceUrls([...sourceURLs, url])
 
+        setVideoThumbnails([...videoThumbnails, null]);
         const thumbnail = await generateVideoThumbnails(file, 1, 'jpeg');
         const previewImg = { thumbnail: thumbnail[1] ?? thumbnail[0], name: file?.name ?? `Video ${sourceURLs.length + 1}`, type: file?.type };
         setVideoThumbnails([...videoThumbnails, previewImg]);
@@ -37,14 +49,14 @@ export default function ({ videoThumbnails, removeVideo, sourceURLs, setSourceUr
     return (
         <div className="preview-container">
             {videoThumbnails.map((metadata, index) => (
-                <div style={{ position: 'relative' }}>
+                <div className='preview-box' onClick={() => setCurrUrlidx(index)}>
                     <FontAwesomeIcon icon={faRemove} className="remove-icon" onClick={() => removeVideo(index)} />
                     {(metadata?.thumbnail !== null && metadata?.thumbnail !== undefined) ? (
-                        <img src={metadata?.thumbnail} className="preview-image" />
+                        <img src={metadata?.thumbnail} className={`preview-image preview-image-${(currUrlIdx === index) ? 'active' : 'disabled'}`} />
                     )
                         :
                         <div>
-                            <Shimmer width={120} height={120} className='preview-image' />
+                            <Shimmer width={120} height={120} className={`preview-image preview-image-${(currUrlIdx === index) ? 'active' : 'disabled'}`} />
                         </div>
                     }
 
@@ -59,7 +71,7 @@ export default function ({ videoThumbnails, removeVideo, sourceURLs, setSourceUr
                 </div>
             ))}
             {videoThumbnails?.length < 5 && (
-                <div>
+                <div title="Add another video">
                     <input type="file" onChange={(e) => addNewVideo(e.target.files)} className='hidden' ref={fileinputRef} multiple={false} accept='video/*' />
                     <div className='add-more-videos' onClick={() => fileinputRef?.current?.click()}>
                         <FontAwesomeIcon icon={faPlus} className='plus-icon' />

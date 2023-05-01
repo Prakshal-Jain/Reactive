@@ -6,6 +6,11 @@
     gap: 2rem;
 }
 
+.preview-box {
+    position: relative;
+    cursor: pointer;
+}
+
 .remove-icon {
     text-align: end;
     position: absolute;
@@ -32,7 +37,20 @@
     height: 120px;
     border-radius: 10px;
     object-fit: cover;
+    transition: border 0.3s ease;
+}
+
+.preview-image:hover {
+    border: 0.1rem solid rgb(107, 178, 255);
+    transition: border 0.3s ease;
+}
+
+.preview-image-disabled {
     border: 0.1rem solid rgba(255, 45, 85);
+}
+
+.preview-image-active {
+    border: 0.1rem solid rgb(0, 122, 255);
 }
 
 .video-placeholder {

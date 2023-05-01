@@ -4,8 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useRef } from 'react';
 import "./editor.css";
-import { useEffect } from 'react';
 import PreviewGallery from '../components/PreviewGallery';
+import { StateContext } from '../state_context';
 
 type Props = {
     sourceURLs: Array<string>,
@@ -13,12 +13,22 @@ type Props = {
     setVideoThumbnails: (setSourceUrls: Array<{ thumbnail: string, name: string, type: string } | null>) => void,
     removeVideo: (index: number) => void,
     currUrlIdx: number,
+    setCurrUrlidx: (idx: number) => void,
     setSourceUrls: (setSourceUrls: Array<string>) => void,
 }
 
 var throttle = require('lodash/throttle');
 
-export default function ({ sourceURLs, videoThumbnails, removeVideo, currUrlIdx, setSourceUrls, setVideoThumbnails }: Props) {
+export default function () {
+
+    const ctx = React.useContext(StateContext);
+
+    if (ctx === null || ctx === undefined) {
+        return null;
+    }
+
+    const { sourceURLs, videoThumbnails, removeVideo, currUrlIdx, setSourceUrls, setVideoThumbnails, setCurrUrlidx }: Props = ctx;
+
     const videoRef = useRef<HTMLVideoElement>(null);
     const playBackBarRef = useRef<HTMLDivElement>(null);
     const progressBarRef = useRef<HTMLDivElement>(null);
@@ -83,7 +93,7 @@ export default function ({ sourceURLs, videoThumbnails, removeVideo, currUrlIdx,
     }
 
     return (
-        <div className='video-editor-container'>
+        <div className='video-editor-container' key={`${videoThumbnails[currUrlIdx]?.name}-${currUrlIdx}-video`}>
             <video
                 ref={videoRef}
                 onLoadedMetadata={(event) => handleLoadedVideo(event.target)}
@@ -121,13 +131,7 @@ export default function ({ sourceURLs, videoThumbnails, removeVideo, currUrlIdx,
                 </div>
             </div>
 
-            <PreviewGallery
-                videoThumbnails={videoThumbnails}
-                removeVideo={removeVideo}
-                sourceURLs={sourceURLs}
-                setSourceUrls={setSourceUrls}
-                setVideoThumbnails={setVideoThumbnails}
-            />
+            <PreviewGallery />
         </div>
     )
 }
