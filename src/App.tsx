@@ -6,6 +6,9 @@ import './App.css';
 import Uploader from './Editor/Uploader';
 import Editor from './Editor/Editor';
 import { StateContext } from './state_context';
+import { useEffect } from 'react';
+
+const MAX_VIDEO_LIMIT: number = 5;
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
@@ -14,17 +17,33 @@ function App() {
   const [videoThumbnails, setVideoThumbnails] = useState<Array<{ thumbnail: string, name: string, type: string } | null>>([]);
   const [currUrlIdx, setCurrUrlidx] = useState<number>(0);
 
+  useEffect(() => {
+    const unloadCallback = (event: Event) => {
+      event.preventDefault();
+      event.returnValue = false;
+      return null;
+    };
+
+    window.addEventListener("beforeunload", unloadCallback);
+    return () => window.removeEventListener("beforeunload", unloadCallback);
+  }, []);
+
   const removeVideo = (index: number) => {
     if (sourceURLs.length === 0) {
       return;
     }
-    if (sourceURLs.length === 1) {
+    else if (sourceURLs.length === 1) {
       setSourceUrls([]);
       setVideoThumbnails([]);
       setCurrUrlidx(0);
       setShowEditor(false);
+      return;
     }
     else {
+      if (currUrlIdx === index && currUrlIdx === (sourceURLs.length - 1)) {
+        setCurrUrlidx(index - 1);
+      }
+
       const urls = [...sourceURLs];
       urls.splice(index, 1);
       setSourceUrls(urls);

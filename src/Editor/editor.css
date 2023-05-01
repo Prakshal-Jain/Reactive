@@ -7,17 +7,26 @@
 .portrait {
     height: 65vh;
     width: auto;
+    display: block;
+    transition: display 0.3s ease;
 }
 
 .landscape {
     width: 65vw;
     height: auto;
+    display: block;
+    transition: display 0.3s ease;
 }
 
 .video-editor-container {
     display: flex;
     flex-direction: column;
     gap: 2.5rem;
+}
+
+.video-undecided-size-hidden{
+    display: none;
+    transition: display 0.3s ease;
 }
 
 /* ============ Controls Buttons ============ */

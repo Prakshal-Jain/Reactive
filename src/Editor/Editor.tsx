@@ -42,7 +42,7 @@ export default function () {
     const [isPlaying, setIsPlaying] = useState<boolean>(videoRef?.current?.paused ?? false);
 
     const handleLoadedVideo = (videoElement: any) => {
-        if (videoElement.clientHeight > window.innerHeight) {
+        if (videoElement.clientHeight > videoElement.clientWidth) {
             setIsPortrait(true);
         }
         else {
@@ -97,10 +97,11 @@ export default function () {
             <video
                 ref={videoRef}
                 onLoadedMetadata={(event) => handleLoadedVideo(event.target)}
-                onLoadedData={(e) => console.log(e)}
+                // onLoadedData={(e) => console.log(e)}
                 className={`video-element ${isPortrait ? 'portrait' : 'landscape'}`}
                 muted={isMuted}
                 onClick={setPlayPause}
+                key={`${videoThumbnails[currUrlIdx]?.name}-${currUrlIdx}-video-element`}
             >
                 <source src={sourceURLs[currUrlIdx]} type='video/mp4' />
             </video>

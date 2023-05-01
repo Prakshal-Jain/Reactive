@@ -46,11 +46,12 @@ export default function () {
     if (videoThumbnails?.length === 0) {
         return null;
     }
+
     return (
         <div className="preview-container">
             {videoThumbnails.map((metadata, index) => (
-                <div className='preview-box' onClick={() => setCurrUrlidx(index)}>
-                    <FontAwesomeIcon icon={faRemove} className="remove-icon" onClick={() => removeVideo(index)} />
+                <div className='preview-box' onClick={() => setCurrUrlidx(index)} key={`preview-${index}`}>
+                    <FontAwesomeIcon icon={faRemove} className="remove-icon" onClick={(e) => { removeVideo(index); e.stopPropagation() }} />
                     {(metadata?.thumbnail !== null && metadata?.thumbnail !== undefined) ? (
                         <img src={metadata?.thumbnail} className={`preview-image preview-image-${(currUrlIdx === index) ? 'active' : 'disabled'}`} />
                     )

@@ -1,11 +1,10 @@
-import { faAngleRight, faRemove, faSmile, faSmileWink } from '@fortawesome/free-solid-svg-icons';
+import { faAngleRight, faSmile, faSmileWink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRef } from 'react';
 import { useEffect } from 'react';
 import { FileDrop } from 'react-file-drop'
 import './uploader.css';
 import { generateVideoThumbnails } from '@rajesh896/video-thumbnails-generator';
-import { Shimmer } from 'react-shimmer';
 import PreviewGallery from '../components/PreviewGallery';
 import { useContext } from 'react';
 import { StateContext } from '../state_context';
