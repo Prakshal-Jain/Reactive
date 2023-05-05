@@ -7,7 +7,7 @@ import './uploader.css';
 import { generateVideoThumbnails } from '@rajesh896/video-thumbnails-generator';
 import PreviewGallery from '../components/PreviewGallery';
 import { useContext } from 'react';
-import { StateContext } from '../state_context';
+import { StateContext, StateContextType } from '../state_context';
 
 type Props = {
     sourceURLs: Array<string>,
@@ -18,6 +18,8 @@ type Props = {
     setShowEditor: (setShowEditor: boolean) => void,
     currUrlIdx: number,
     setCurrUrlidx: (idx: number) => void,
+    splitTimeStamps: StateContextType['splitTimeStamps'],
+    setSplitTimeStamps: StateContextType['setSplitTimeStamps'],
 }
 
 export default function () {
@@ -25,11 +27,11 @@ export default function () {
 
     const ctx = useContext(StateContext);
 
-    if(ctx === null || ctx === undefined){
+    if (ctx === null || ctx === undefined) {
         return null;
     }
 
-    const { sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, removeVideo, setShowEditor, currUrlIdx, setCurrUrlidx }: Props = ctx;
+    const { sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, removeVideo, setShowEditor, currUrlIdx, setCurrUrlidx, splitTimeStamps, setSplitTimeStamps }: Props = ctx;
 
     useEffect(() => {
         document.addEventListener('drop', function (e) {
@@ -47,15 +49,17 @@ export default function () {
 
             return url;
         });
-        
+
         setSourceUrls([...sourceURLs, ...toUpload]);
         setVideoThumbnails([...videoThumbnails, ...thumbnails]);
+        
 
         for (let i = 0; i < allFiles.length; i++) {
             const thumbnailArray = await generateVideoThumbnails(allFiles[i], 1, 'jpeg');
             thumbnails[i] = { thumbnail: thumbnailArray[1] ?? thumbnailArray[0], name: allFiles[i]?.name ?? `Video ${i + 1}`, type: allFiles[i]?.type };
         }
         setVideoThumbnails([...videoThumbnails, ...thumbnails]);
+        setSplitTimeStamps([...splitTimeStamps, []]);
     }
 
     return (

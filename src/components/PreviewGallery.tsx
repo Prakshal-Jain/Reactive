@@ -4,7 +4,7 @@ import { Shimmer } from "react-shimmer";
 import { generateVideoThumbnails } from '@rajesh896/video-thumbnails-generator';
 import "./previewgallery.css";
 import { useContext, useRef } from "react";
-import { StateContext } from "../state_context";
+import { StateContext, StateContextType } from "../state_context";
 
 type Props = {
     videoThumbnails: Array<{ thumbnail: string, name: string, type: string } | null>,
@@ -14,6 +14,8 @@ type Props = {
     setSourceUrls: (setSourceUrls: Array<string>) => void,
     currUrlIdx: number,
     setCurrUrlidx: (idx: number) => void,
+    splitTimeStamps: StateContextType['splitTimeStamps'],
+    setSplitTimeStamps: StateContextType['setSplitTimeStamps'],
 }
 
 export default function () {
@@ -25,7 +27,7 @@ export default function () {
         return null;
     }
 
-    const { videoThumbnails, removeVideo, sourceURLs, setSourceUrls, setVideoThumbnails, currUrlIdx, setCurrUrlidx }: Props = ctx;
+    const { videoThumbnails, removeVideo, sourceURLs, setSourceUrls, setVideoThumbnails, currUrlIdx, setCurrUrlidx, setSplitTimeStamps, splitTimeStamps }: Props = ctx;
 
     const addNewVideo = async (files: (FileList | null)) => {
         if (files === null) {
@@ -40,6 +42,8 @@ export default function () {
         const thumbnail = await generateVideoThumbnails(file, 1, 'jpeg');
         const previewImg = { thumbnail: thumbnail[1] ?? thumbnail[0], name: file?.name ?? `Video ${sourceURLs.length + 1}`, type: file?.type };
         setVideoThumbnails([...videoThumbnails, previewImg]);
+
+        setSplitTimeStamps([...splitTimeStamps, []]);
     }
 
 

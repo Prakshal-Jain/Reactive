@@ -12,6 +12,8 @@ export interface StateContextType {
     currUrlIdx: number,
     setCurrUrlidx: (idx: number) => void,
     setSourceUrls: (setSourceUrls: Array<string>) => void,
+    splitTimeStamps: Array<Array<{ start: number, end: number }>>
+    setSplitTimeStamps: (split: StateContextType['splitTimeStamps']) => void
 }
 
 export const StateContext = React.createContext<StateContextType | null>(null);

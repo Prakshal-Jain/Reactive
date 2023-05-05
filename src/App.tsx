@@ -1,32 +1,26 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome' // https://fontawesome.com/v5/docs/web/use-with/react
 import { faClosedCaptioning, faLanguage, faLightbulb, faMoon, faPhotoVideo } from '@fortawesome/free-solid-svg-icons' // https://fontawesome.com/v5/docs/web/use-with/react
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import './App.css';
 import Uploader from './Editor/Uploader';
 import Editor from './Editor/Editor';
-import { StateContext } from './state_context';
+import { StateContext, StateContextType } from './state_context';
 import { useEffect } from 'react';
 
 const MAX_VIDEO_LIMIT: number = 5;
 
 function App() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
-  const [showEditor, setShowEditor] = useState<boolean>(false);
-  const [sourceURLs, setSourceUrls] = useState<Array<string>>([]);
-  const [videoThumbnails, setVideoThumbnails] = useState<Array<{ thumbnail: string, name: string, type: string } | null>>([]);
-  const [currUrlIdx, setCurrUrlidx] = useState<number>(0);
+  const [theme, setTheme] = useState<StateContextType['theme']>('dark')
+  const [showEditor, setShowEditor] = useState<StateContextType['showEditor']>(false);
+  const [sourceURLs, setSourceUrls] = useState<StateContextType['sourceURLs']>([]);
+  const [videoThumbnails, setVideoThumbnails] = useState<StateContextType['videoThumbnails']>([]);
+  const [currUrlIdx, setCurrUrlidx] = useState<StateContextType['currUrlIdx']>(0);
+  const [splitTimeStamps, setSplitTimeStamps] = useState<StateContextType['splitTimeStamps']>([]);
 
   useEffect(() => {
-    const unloadCallback = (event: Event) => {
-      event.preventDefault();
-      event.returnValue = false;
-      return null;
-    };
-
-    window.addEventListener("beforeunload", unloadCallback);
-    return () => window.removeEventListener("beforeunload", unloadCallback);
-  }, []);
+    console.log(splitTimeStamps);
+  }, [splitTimeStamps]);
 
   const removeVideo = (index: number) => {
     if (sourceURLs.length === 0) {
@@ -37,6 +31,7 @@ function App() {
       setVideoThumbnails([]);
       setCurrUrlidx(0);
       setShowEditor(false);
+      setSplitTimeStamps([]);
       return;
     }
     else {
@@ -51,11 +46,15 @@ function App() {
       const thumbnails = [...videoThumbnails];
       thumbnails.splice(index, 1);
       setVideoThumbnails(thumbnails);
+
+      const splits = [...splitTimeStamps];
+      splits.splice(index, 1);
+      setSplitTimeStamps(splits);
     }
   }
 
   return (
-    <StateContext.Provider value={{ theme, setTheme, showEditor, setShowEditor, sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, currUrlIdx, setCurrUrlidx, removeVideo }} >
+    <StateContext.Provider value={{ theme, setTheme, showEditor, setShowEditor, sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, currUrlIdx, setCurrUrlidx, removeVideo, splitTimeStamps, setSplitTimeStamps }} >
       <div className={`${theme}-theme-bg page-container`}>
         <div className="video-editor-container">
           {/* Add editor here */}

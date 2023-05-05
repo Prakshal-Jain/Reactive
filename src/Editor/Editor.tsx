@@ -5,7 +5,8 @@ import { useState } from 'react';
 import { useRef } from 'react';
 import "./editor.css";
 import PreviewGallery from '../components/PreviewGallery';
-import { StateContext } from '../state_context';
+import { StateContext, StateContextType } from '../state_context';
+import { useEffect } from 'react';
 
 type Props = {
     sourceURLs: Array<string>,
@@ -15,11 +16,24 @@ type Props = {
     currUrlIdx: number,
     setCurrUrlidx: (idx: number) => void,
     setSourceUrls: (setSourceUrls: Array<string>) => void,
+    splitTimeStamps: StateContextType['splitTimeStamps'],
+    setSplitTimeStamps: StateContextType['setSplitTimeStamps'],
 }
 
 var throttle = require('lodash/throttle');
 
 export default function () {
+
+    useEffect(() => {
+        const unloadCallback = (event: Event) => {
+            event.preventDefault();
+            event.returnValue = false;
+            return null;
+        };
+
+        window.addEventListener("beforeunload", unloadCallback);
+        return () => window.removeEventListener("beforeunload", unloadCallback);
+    }, []);
 
     const ctx = React.useContext(StateContext);
 
@@ -27,7 +41,7 @@ export default function () {
         return null;
     }
 
-    const { sourceURLs, videoThumbnails, removeVideo, currUrlIdx, setSourceUrls, setVideoThumbnails, setCurrUrlidx }: Props = ctx;
+    const { sourceURLs, videoThumbnails, removeVideo, currUrlIdx, setSourceUrls, setVideoThumbnails, setCurrUrlidx, splitTimeStamps, setSplitTimeStamps }: Props = ctx;
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const playBackBarRef = useRef<HTMLDivElement>(null);
@@ -47,6 +61,12 @@ export default function () {
         }
         else {
             setIsPortrait(false);
+        }
+
+        if (splitTimeStamps[currUrlIdx].length === 0) {
+            const splitVideo = [...splitTimeStamps];
+            splitVideo[currUrlIdx].push({ start: 0, end: videoElement.duration });
+            setSplitTimeStamps(splitVideo);
         }
     }
 
@@ -93,46 +113,49 @@ export default function () {
     }
 
     return (
-        <div className='video-editor-container' key={`${videoThumbnails[currUrlIdx]?.name}-${currUrlIdx}-video`}>
-            <video
-                ref={videoRef}
-                onLoadedMetadata={(event) => handleLoadedVideo(event.target)}
-                // onLoadedData={(e) => console.log(e)}
-                className={`video-element ${isPortrait ? 'portrait' : 'landscape'}`}
-                muted={isMuted}
-                onClick={setPlayPause}
-                key={`${videoThumbnails[currUrlIdx]?.name}-${currUrlIdx}-video-element`}
-            >
-                <source src={sourceURLs[currUrlIdx]} type='video/mp4' />
-            </video>
+        <div>
+            <h3 style={{ textAlign: 'center' }}>{videoThumbnails[currUrlIdx]?.name}</h3>
+            <div className='video-editor-container' key={`${videoThumbnails[currUrlIdx]?.name}-${currUrlIdx}-video`}>
+                <video
+                    ref={videoRef}
+                    onLoadedMetadata={(event) => handleLoadedVideo(event.target)}
+                    // onLoadedData={(e) => console.log(e)}
+                    className={`video-element ${isPortrait ? 'portrait' : 'landscape'}`}
+                    muted={isMuted}
+                    onClick={setPlayPause}
+                    key={`${videoThumbnails[currUrlIdx]?.name}-${currUrlIdx}-video-element`}
+                >
+                    <source src={sourceURLs[currUrlIdx]} type='video/mp4' />
+                </video>
 
-            <div className="progressbar-container">
-                {seekTime !== null && (
-                    <div style={{ left: seekTime?.offset }} className='seektime'>
-                        {seekTime?.time}
+                <div className="progressbar-container">
+                    {seekTime !== null && (
+                        <div style={{ left: seekTime?.offset }} className='seektime'>
+                            {seekTime?.time}
+                        </div>
+                    )}
+
+                    <div
+                        className='progressbar-base'
+                        ref={playBackBarRef}
+                        onClick={(event) => updateProgress(event.clientX)}
+                        onMouseEnter={() => { setSeekTime(null); }}
+                        onMouseMove={(event) => displayVideoSeekTime(event.clientX)}
+                        onMouseLeave={() => { setSeekTime(null); displayVideoSeekTime.cancel() }}
+                    />
+                </div>
+
+                <div className='controls'>
+                    <div className="controls-group">
+                        <button className='control-btn' title='Mute/Unmute Video' onClick={() => setIsMuted(!isMuted)}>{isMuted ? <FontAwesomeIcon icon={faVolumeMute} className='control-icon' /> : <FontAwesomeIcon icon={faVolumeUp} className='control-icon' />}</button>
                     </div>
-                )}
-
-                <div
-                    className='progressbar-base'
-                    ref={playBackBarRef}
-                    onClick={(event) => updateProgress(event.clientX)}
-                    onMouseEnter={() => { setSeekTime(null); }}
-                    onMouseMove={(event) => displayVideoSeekTime(event.clientX)}
-                    onMouseLeave={() => { setSeekTime(null); displayVideoSeekTime.cancel() }}
-                />
-            </div>
-
-            <div className='controls'>
-                <div className="controls-group">
-                    <button className='control-btn' title='Mute/Unmute Video' onClick={() => setIsMuted(!isMuted)}>{isMuted ? <FontAwesomeIcon icon={faVolumeMute} className='control-icon' /> : <FontAwesomeIcon icon={faVolumeUp} className='control-icon' />}</button>
+                    <div className="controls-group">
+                        <button className='control-btn' title='Play/Pause Video' onClick={setPlayPause}>{isPlaying ? <FontAwesomeIcon icon={faPause} className='control-icon' /> : <FontAwesomeIcon icon={faPlay} className='control-icon' />}</button>
+                    </div>
                 </div>
-                <div className="controls-group">
-                    <button className='control-btn' title='Play/Pause Video' onClick={setPlayPause}>{isPlaying ? <FontAwesomeIcon icon={faPause} className='control-icon' /> : <FontAwesomeIcon icon={faPlay} className='control-icon' />}</button>
-                </div>
-            </div>
 
-            <PreviewGallery />
+                <PreviewGallery />
+            </div>
         </div>
     )
 }
