@@ -9,6 +9,7 @@ import { StateContext, StateContextType } from './state_context';
 import { useEffect } from 'react';
 
 const MAX_VIDEO_LIMIT: number = 5;
+const PROGRESSBAR_IMAGES_COUNT: number = 10;
 
 function App() {
   const [theme, setTheme] = useState<StateContextType['theme']>('dark')
@@ -20,7 +21,7 @@ function App() {
 
   useEffect(() => {
     console.log(splitTimeStamps);
-  }, [splitTimeStamps]);
+  }, [splitTimeStamps])
 
   const removeVideo = (index: number) => {
     if (sourceURLs.length === 0) {
@@ -54,7 +55,7 @@ function App() {
   }
 
   return (
-    <StateContext.Provider value={{ theme, setTheme, showEditor, setShowEditor, sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, currUrlIdx, setCurrUrlidx, removeVideo, splitTimeStamps, setSplitTimeStamps }} >
+    <StateContext.Provider value={{ theme, setTheme, showEditor, setShowEditor, sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, currUrlIdx, setCurrUrlidx, removeVideo, splitTimeStamps, setSplitTimeStamps, PROGRESSBAR_IMAGES_COUNT }} >
       <div className={`${theme}-theme-bg page-container`}>
         <div className="video-editor-container">
           {/* Add editor here */}

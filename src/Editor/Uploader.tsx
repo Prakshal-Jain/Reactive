@@ -12,8 +12,8 @@ import { StateContext, StateContextType } from '../state_context';
 type Props = {
     sourceURLs: Array<string>,
     setSourceUrls: (setSourceUrls: Array<string>) => void,
-    videoThumbnails: Array<{ thumbnail: string, name: string, type: string } | null>,
-    setVideoThumbnails: (setSourceUrls: Array<{ thumbnail: string, name: string, type: string } | null>) => void,
+    videoThumbnails: StateContextType['videoThumbnails'],
+    setVideoThumbnails: StateContextType['setVideoThumbnails'],
     removeVideo: (index: number) => void,
     setShowEditor: (setShowEditor: boolean) => void,
     currUrlIdx: number,
@@ -43,7 +43,7 @@ export default function () {
     const uploadVideo = async (files: (FileList | null)) => {
         const allFiles = Array.from(files ?? []);
 
-        const thumbnails: Array<{ thumbnail: string, name: string, type: string } | null> = Array(allFiles.length).fill(null);
+        const thumbnails: Array<{ thumbnails: Array<string>, name: string, type: string } | null> = Array(allFiles.length).fill(null);
         const toUpload: Array<string> = allFiles.map((v, i) => {
             const url: string = URL.createObjectURL(v);
 
@@ -51,15 +51,14 @@ export default function () {
         });
 
         setSourceUrls([...sourceURLs, ...toUpload]);
+        setSplitTimeStamps([...splitTimeStamps, ...Array(allFiles.length).fill(0).map(_ => [])]);
         setVideoThumbnails([...videoThumbnails, ...thumbnails]);
-        
 
         for (let i = 0; i < allFiles.length; i++) {
-            const thumbnailArray = await generateVideoThumbnails(allFiles[i], 1, 'jpeg');
-            thumbnails[i] = { thumbnail: thumbnailArray[1] ?? thumbnailArray[0], name: allFiles[i]?.name ?? `Video ${i + 1}`, type: allFiles[i]?.type };
+            const thumbnailArray = await generateVideoThumbnails(allFiles[i], 10, 'jpeg');
+            thumbnails[i] = { thumbnails: thumbnailArray, name: allFiles[i]?.name ?? `Video ${i + 1}`, type: allFiles[i]?.type };
         }
         setVideoThumbnails([...videoThumbnails, ...thumbnails]);
-        setSplitTimeStamps([...splitTimeStamps, []]);
     }
 
     return (

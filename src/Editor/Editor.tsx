@@ -7,11 +7,12 @@ import "./editor.css";
 import PreviewGallery from '../components/PreviewGallery';
 import { StateContext, StateContextType } from '../state_context';
 import { useEffect } from 'react';
+import Progressbar from '../components/Progressbar';
 
 type Props = {
     sourceURLs: Array<string>,
-    videoThumbnails: Array<{ thumbnail: string, name: string, type: string } | null>,
-    setVideoThumbnails: (setSourceUrls: Array<{ thumbnail: string, name: string, type: string } | null>) => void,
+    videoThumbnails: StateContextType['videoThumbnails'],
+    setVideoThumbnails: StateContextType['setVideoThumbnails'],
     removeVideo: (index: number) => void,
     currUrlIdx: number,
     setCurrUrlidx: (idx: number) => void,
@@ -135,14 +136,16 @@ export default function () {
                         </div>
                     )}
 
-                    <div
+                    <Progressbar videoDuration={videoRef.current?.duration} />
+
+                    {/* <div
                         className='progressbar-base'
                         ref={playBackBarRef}
                         onClick={(event) => updateProgress(event.clientX)}
                         onMouseEnter={() => { setSeekTime(null); }}
                         onMouseMove={(event) => displayVideoSeekTime(event.clientX)}
                         onMouseLeave={() => { setSeekTime(null); displayVideoSeekTime.cancel() }}
-                    />
+                    /> */}
                 </div>
 
                 <div className='controls'>

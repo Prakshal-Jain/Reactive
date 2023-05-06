@@ -1,3 +1,7 @@
+html, body {
+  background-color: rgb(28, 28, 30);
+}
+
 .page-container {
   width: 100%;
   min-height: 100vh;
@@ -7,7 +11,7 @@
   justify-content: center;
 }
 
-.video-editor-container{
+.video-editor-container {
   display: flex;
   flex-grow: 1;
   margin: 2rem;
@@ -25,7 +29,7 @@
 .dark-theme-bg {
   background-color: rgb(28, 28, 30);
   transition: background-color 0.3s ease, color 0.3s ease;
-  color:rgb(242, 242, 247);
+  color: rgb(242, 242, 247);
 }
 
 .auto-theme-bg {
@@ -54,13 +58,13 @@
   border: 0.1rem solid rgba(119, 119, 119, 0.3);
 }
 
-.footer-container > div {
+.footer-container>div {
   padding: 0.5rem;
   cursor: pointer;
   border-radius: 5px;
 }
 
-.footer-container > div:hover {
+.footer-container>div:hover {
   background-color: rgba(28, 28, 30, 0.4);
   transition: background-color 0.3s ease;
 }

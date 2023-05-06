@@ -7,8 +7,8 @@ import { useContext, useRef } from "react";
 import { StateContext, StateContextType } from "../state_context";
 
 type Props = {
-    videoThumbnails: Array<{ thumbnail: string, name: string, type: string } | null>,
-    setVideoThumbnails: (setSourceUrls: Array<{ thumbnail: string, name: string, type: string } | null>) => void,
+    videoThumbnails: StateContextType['videoThumbnails'],
+    setVideoThumbnails: StateContextType['setVideoThumbnails'],
     removeVideo: (index: number) => void,
     sourceURLs: Array<string>,
     setSourceUrls: (setSourceUrls: Array<string>) => void,
@@ -39,8 +39,8 @@ export default function () {
         setSourceUrls([...sourceURLs, url])
 
         setVideoThumbnails([...videoThumbnails, null]);
-        const thumbnail = await generateVideoThumbnails(file, 1, 'jpeg');
-        const previewImg = { thumbnail: thumbnail[1] ?? thumbnail[0], name: file?.name ?? `Video ${sourceURLs.length + 1}`, type: file?.type };
+        const thumbnails = await generateVideoThumbnails(file, 10, 'jpeg');
+        const previewImg = { thumbnails, name: file?.name ?? `Video ${sourceURLs.length + 1}`, type: file?.type };
         setVideoThumbnails([...videoThumbnails, previewImg]);
 
         setSplitTimeStamps([...splitTimeStamps, []]);
@@ -56,8 +56,8 @@ export default function () {
             {videoThumbnails.map((metadata, index) => (
                 <div className='preview-box' onClick={() => setCurrUrlidx(index)} key={`preview-${index}`}>
                     <FontAwesomeIcon icon={faRemove} className="remove-icon" onClick={(e) => { removeVideo(index); e.stopPropagation() }} />
-                    {(metadata?.thumbnail !== null && metadata?.thumbnail !== undefined) ? (
-                        <img src={metadata?.thumbnail} className={`preview-image preview-image-${(currUrlIdx === index) ? 'active' : 'disabled'}`} />
+                    {(metadata?.thumbnails !== null && metadata?.thumbnails !== undefined) ? (
+                        <img src={metadata?.thumbnails[1] ?? metadata?.thumbnails[2] ?? metadata?.thumbnails[0]} className={`preview-image preview-image-${(currUrlIdx === index) ? 'active' : 'disabled'}`} />
                     )
                         :
                         <div>

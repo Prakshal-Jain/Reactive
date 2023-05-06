@@ -1,0 +1,70 @@
+.progressbar-container {
+    width: 60vw;
+    height: 4rem;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.progressbar-container > img {
+    pointer-events: none;
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+}
+
+.cropped-section-left {
+    width: 10rem;
+    height: 4rem;
+    position: absolute;
+    top: -0.2rem;
+    left: 15px;
+    border-top: 0.2rem solid #ffd300;
+    border-bottom: 0.2rem solid #ffd300;
+    border-left: 0.6rem solid #ffd300;
+    border-right: 0.6rem solid #ffd300;
+    border-radius: 5px;
+}
+
+.start-grabber {
+    height: 4.4rem;
+    position: absolute;
+    left: -0.6rem;
+    top: -0.2rem;
+    width: 0.6rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+}
+
+.start-grabber:active {
+    cursor: grabbing;
+}
+
+.end-grabber {
+    height: 4.4rem;
+    position: absolute;
+    right: -0.6rem;
+    top: -0.2rem;
+    width: 0.6rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+}
+
+.end-grabber:active {
+    cursor: grabbing;
+}
+
+.grip-icon {
+    color: rgb(28, 28, 30);
+}
