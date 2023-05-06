@@ -16,18 +16,18 @@ type Props = {
 type CropperSectionProps = {
     left: number,
     right: number,
-    onMouseDown: (event: any) => void,
-    onMouseUp: (event: any) => void,
+    onMouseDown: (position: number, type: 'start' | 'end') => void,
+    onMouseUp: (position: number, type: 'start' | 'end') => void,
 }
 
 function CroppedSection({ left, right, onMouseDown, onMouseUp }: CropperSectionProps) {
     const width = right - left - 17;
     return (
         <div className="cropped-section-left" style={{ left: `${left}px`, width: `${width}px` }}>
-            <div className="start-grabber" onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
+            <div className="start-grabber" onMouseDown={(event) => onMouseDown(event.clientX, 'start')} onMouseUp={(event) => onMouseUp(event.clientX, 'start')}>
                 <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
             </div>
-            <div className="end-grabber">
+            <div className="end-grabber" onMouseDown={(event) => onMouseDown(event.clientX, 'end')} onMouseUp={(event) => onMouseUp(event.clientX, 'end')}>
                 <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
             </div>
         </div>)
@@ -37,6 +37,7 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
     const ctx = useContext(StateContext);
     const progressRef = useRef<HTMLDivElement>(null);
     const [imgWidth, setimgWidth] = useState<number | null>(null);
+    const [mouseMoveData, setMouseMoveData] = useState<{ index: number, type: 'start' | 'end', position: number } | null>(null)
 
     useEffect(() => {
         const boundingRect = progressRef.current?.getBoundingClientRect();
@@ -60,6 +61,26 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
         return 50;
     }
 
+    const handleMouseDown = (index: number, position: number, type: 'start' | 'end') => {
+        if (mouseMoveData !== null) {
+            return;
+        }
+
+        setMouseMoveData({
+            index,
+            position,
+            type,
+        })
+    }
+
+    const handleMouseUp = (index: number, position: number, type: 'start' | 'end') => {
+        if (mouseMoveData === null) {
+            return;
+        }
+
+        setMouseMoveData(null);
+    }
+
     return (
         <div className="progressbar-container" ref={progressRef}>
             {(imgWidth !== null && videoThumbnails !== null && videoThumbnails[currUrlIdx] !== null) ? (
@@ -70,8 +91,9 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
             }
 
             {(videoDuration !== undefined) && splitTimeStamps[currUrlIdx]?.map(({ start, end }, index) => (
-                <CroppedSection left={getOffsetFromTimestamp(start)} right={getOffsetFromTimestamp(end)} onMouseDown={() => console.log('mouse down')} onMouseUp={() => console.log('mouse up')} />
+                <CroppedSection left={getOffsetFromTimestamp(start)} right={getOffsetFromTimestamp(end)} onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)} onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)} key={`cropped-section-${currUrlIdx}-${index}`} />
             ))}
-        </div>
+            </div>
     )
+                
 }
