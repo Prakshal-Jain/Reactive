@@ -1,5 +1,5 @@
 import "./progressbar.css";
-import { SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
+import { MouseEventHandler, SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
 import { StateContext, StateContextType } from '../state_context';
 import { Shimmer } from "react-shimmer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,13 +16,15 @@ type Props = {
 type CropperSectionProps = {
     left: number,
     right: number,
+    onMouseDown: (event: any) => void,
+    onMouseUp: (event: any) => void,
 }
 
-function CroppedSection({ left, right }: CropperSectionProps) {
+function CroppedSection({ left, right, onMouseDown, onMouseUp }: CropperSectionProps) {
     const width = right - left - 17;
     return (
         <div className="cropped-section-left" style={{ left: `${left}px`, width: `${width}px` }}>
-            <div className="start-grabber">
+            <div className="start-grabber" onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
                 <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
             </div>
             <div className="end-grabber">
@@ -68,7 +70,7 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
             }
 
             {(videoDuration !== undefined) && splitTimeStamps[currUrlIdx]?.map(({ start, end }, index) => (
-                <CroppedSection left={getOffsetFromTimestamp(start)} right={getOffsetFromTimestamp(end)} />
+                <CroppedSection left={getOffsetFromTimestamp(start)} right={getOffsetFromTimestamp(end)} onMouseDown={() => console.log('mouse down')} onMouseUp={() => console.log('mouse up')} />
             ))}
         </div>
     )

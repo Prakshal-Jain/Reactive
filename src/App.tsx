@@ -19,10 +19,6 @@ function App() {
   const [currUrlIdx, setCurrUrlidx] = useState<StateContextType['currUrlIdx']>(0);
   const [splitTimeStamps, setSplitTimeStamps] = useState<StateContextType['splitTimeStamps']>([]);
 
-  useEffect(() => {
-    console.log(splitTimeStamps);
-  }, [splitTimeStamps])
-
   const removeVideo = (index: number) => {
     if (sourceURLs.length === 0) {
       return;
