@@ -36,6 +36,18 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
         }
     }, [progressRef.current?.getBoundingClientRect()]);
 
+    useEffect(() => {
+        document.addEventListener('mouseup', handleMouseUpOutsideProgressBar);
+
+        return () => document.removeEventListener('mouseup', handleMouseUpOutsideProgressBar);
+    })
+
+    function handleMouseUpOutsideProgressBar(event: any): void {
+        if (progressRef && (!progressRef?.current?.contains(event.target)) && mouseMoveData !== null) {
+            handleMouseUp(mouseMoveData?.index, mouseMoveData?.position, mouseMoveData?.type);
+        }
+    }
+
 
     function CroppedSection({ left, right, onMouseDown, onMouseUp, onMouseMove }: CropperSectionProps) {
         const boundingRect = progressRef.current?.getBoundingClientRect();
@@ -46,14 +58,12 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
                     <div className="start-grabber"
                         onMouseDown={(event) => onMouseDown(Math.abs(event.clientX - boundingRect?.left), 'start')}
                         onMouseUp={(event) => onMouseUp(Math.abs(event.clientX - boundingRect?.left), 'start')}
-                        onMouseMove={(event) => onMouseMove(Math.abs(event.clientX - boundingRect?.left), 'start')}
                     >
                         <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
                     </div>
                     <div className="end-grabber"
                         onMouseDown={(event) => onMouseDown(Math.abs(boundingRect?.left - event.clientX), 'end')}
                         onMouseUp={(event) => onMouseUp(Math.abs(boundingRect?.left - event.clientX), 'end')}
-                        onMouseMove={(event) => onMouseMove(Math.abs(boundingRect?.left - event.clientX), 'end')}
                     >
                         <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
                     </div>
@@ -97,16 +107,35 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
         setMouseMoveData(null);
     }
 
-    const handleMouseMove = (index: number, position: number, type: 'start' | 'end') => {
+    const handleMouseMove = throttle((index: number, position: number, type: 'start' | 'end') => {
         setMouseMoveData({
             index,
             position,
             type,
         })
-    }
+    }, 200)
 
     return (
-        <div className="progressbar-container" ref={progressRef}>
+        <div
+            className="progressbar-container"
+            ref={progressRef}
+            onMouseMove={(event) => {
+                const boundingRect = progressRef.current?.getBoundingClientRect();
+                if (videoDuration === undefined || mouseMoveData === null || boundingRect === null || boundingRect === undefined) {
+                    return
+                }
+                handleMouseMove(mouseMoveData.index, Math.abs(event.clientX - boundingRect?.left), mouseMoveData?.type);
+            }}
+
+        // When cursor leaves the container and pressed out, save the progress.
+        // onMouseLeave={(event) => {
+        //     const boundingRect = progressRef.current?.getBoundingClientRect();
+        //     if (videoDuration === undefined || mouseMoveData === null || boundingRect === null || boundingRect === undefined) {
+        //         return
+        //     }
+        //     handleMouseMove(mouseMoveData.index, Math.abs(event.clientX - boundingRect?.left), mouseMoveData?.type);
+        // }}
+        >
             {(imgWidth !== null && videoThumbnails !== null && videoThumbnails[currUrlIdx] !== null) ? (
                 videoThumbnails[currUrlIdx]?.thumbnails.map((img, index) => (<img src={img} style={{ width: imgWidth, height: '4rem', objectFit: 'cover', borderTopLeftRadius: (index === 0 ? 10 : 0), borderBottomLeftRadius: (index === 0 ? 10 : 0), borderTopRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, borderBottomRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0 }} key={`preview-image-${currUrlIdx}-${index}`} />))
             )
