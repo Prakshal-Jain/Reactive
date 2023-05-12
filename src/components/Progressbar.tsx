@@ -99,10 +99,23 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
         })
     }
 
+    const getTimeStampfromOffset = (position: number): number => {
+        const boundingRect = progressRef.current?.getBoundingClientRect();
+        if (videoDuration !== undefined && boundingRect !== null && boundingRect !== undefined) {
+            return ((position / boundingRect.width) * videoDuration);
+        }
+        return 0;
+    }
+
     const handleMouseUp = (index: number, position: number, type: 'start' | 'end') => {
         if (mouseMoveData === null) {
             return;
         }
+
+        const timestamps = [...splitTimeStamps];
+        timestamps[currUrlIdx][index][type] = getTimeStampfromOffset(position);
+
+        setSplitTimeStamps(timestamps);
 
         setMouseMoveData(null);
     }
