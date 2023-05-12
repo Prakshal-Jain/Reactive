@@ -43,6 +43,7 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
     })
 
     function handleMouseUpOutsideProgressBar(event: any): void {
+        // When cursor leaves the container and pressed out, save the progress.
         if (progressRef && (!progressRef?.current?.contains(event.target)) && mouseMoveData !== null) {
             handleMouseUp(mouseMoveData?.index, mouseMoveData?.position, mouseMoveData?.type);
         }
@@ -139,15 +140,6 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
                 }
                 handleMouseMove(mouseMoveData.index, Math.abs(event.clientX - boundingRect?.left), mouseMoveData?.type);
             }}
-
-        // When cursor leaves the container and pressed out, save the progress.
-        // onMouseLeave={(event) => {
-        //     const boundingRect = progressRef.current?.getBoundingClientRect();
-        //     if (videoDuration === undefined || mouseMoveData === null || boundingRect === null || boundingRect === undefined) {
-        //         return
-        //     }
-        //     handleMouseMove(mouseMoveData.index, Math.abs(event.clientX - boundingRect?.left), mouseMoveData?.type);
-        // }}
         >
             {(imgWidth !== null && videoThumbnails !== null && videoThumbnails[currUrlIdx] !== null) ? (
                 videoThumbnails[currUrlIdx]?.thumbnails.map((img, index) => (<img src={img} style={{ width: imgWidth, height: '4rem', objectFit: 'cover', borderTopLeftRadius: (index === 0 ? 10 : 0), borderBottomLeftRadius: (index === 0 ? 10 : 0), borderTopRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, borderBottomRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0 }} key={`preview-image-${currUrlIdx}-${index}`} />))
