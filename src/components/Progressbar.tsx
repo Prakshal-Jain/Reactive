@@ -28,6 +28,10 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
     const progressRef = useRef<HTMLDivElement>(null);
     const [imgWidth, setimgWidth] = useState<number | null>(null);
     const [mouseMoveData, setMouseMoveData] = useState<{ index: number, type: 'start' | 'end', position: number } | null>(null)
+    const [windowDimensions, setWindowDimensions] = useState<{ height: number, width: number }>({
+        height: window.innerHeight,
+        width: window.innerWidth
+    })
 
     useEffect(() => {
         const boundingRect = progressRef.current?.getBoundingClientRect();
@@ -41,6 +45,22 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
 
         return () => document.removeEventListener('mouseup', handleMouseUpOutsideProgressBar);
     })
+
+    useEffect(() => {
+        window.addEventListener('resize', handleResize)
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, [window.innerHeight, window.innerWidth])
+
+
+    const handleResize = throttle(() => {
+        if ((Math.abs(window.innerHeight - windowDimensions.height) > 10) || (Math.abs(window.innerWidth - windowDimensions.width) > 10)) {
+            setWindowDimensions({
+                height: window.innerHeight,
+                width: window.innerWidth
+            })
+        }
+    }, 300);
 
     function handleMouseUpOutsideProgressBar(event: any): void {
         // When cursor leaves the container and pressed out, save the progress.
@@ -140,6 +160,7 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
                 }
                 handleMouseMove(mouseMoveData.index, Math.abs(event.clientX - boundingRect?.left), mouseMoveData?.type);
             }}
+            key={`progressbar-${currUrlIdx}-width_${windowDimensions.width}-height_${windowDimensions.height}`}
         >
             {(imgWidth !== null && videoThumbnails !== null && videoThumbnails[currUrlIdx] !== null) ? (
                 videoThumbnails[currUrlIdx]?.thumbnails.map((img, index) => (<img src={img} style={{ width: imgWidth, height: '4rem', objectFit: 'cover', borderTopLeftRadius: (index === 0 ? 10 : 0), borderBottomLeftRadius: (index === 0 ? 10 : 0), borderTopRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, borderBottomRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0 }} key={`preview-image-${currUrlIdx}-${index}`} />))
