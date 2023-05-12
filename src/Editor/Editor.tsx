@@ -136,7 +136,7 @@ export default function () {
                         </div>
                     )}
 
-                    <Progressbar videoDuration={videoRef.current?.duration} />
+                    <Progressbar videoRef={videoRef} />
 
                     {/* <div
                         className='progressbar-base'

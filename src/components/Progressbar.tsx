@@ -18,12 +18,11 @@ type CropperSectionProps = {
     right: number,
     onMouseDown: (position: number, type: 'start' | 'end') => void,
     onMouseUp: (position: number, type: 'start' | 'end') => void,
-    onMouseMove: (position: number, type: 'start' | 'end') => void,
 }
 
 var throttle = require('lodash/throttle');
 
-export default function Progressbar({ videoDuration }: { videoDuration: number | undefined }) {
+export default function Progressbar({ videoRef }: { videoRef: any }) {
     const ctx = useContext(StateContext);
     const progressRef = useRef<HTMLDivElement>(null);
     const [imgWidth, setimgWidth] = useState<number | null>(null);
@@ -32,6 +31,8 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
         height: window.innerHeight,
         width: window.innerWidth
     })
+
+    const videoDuration = videoRef.current?.duration ?? 0;
 
     useEffect(() => {
         const boundingRect = progressRef.current?.getBoundingClientRect();
@@ -70,7 +71,7 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
     }
 
 
-    function CroppedSection({ left, right, onMouseDown, onMouseUp, onMouseMove }: CropperSectionProps) {
+    function CroppedSection({ left, right, onMouseDown, onMouseUp }: CropperSectionProps) {
         const boundingRect = progressRef.current?.getBoundingClientRect();
         const width = right - left - 17;
         if (boundingRect !== null && boundingRect !== undefined) {
@@ -133,8 +134,10 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
             return;
         }
 
+        const currTimestamp = getTimeStampfromOffset(position);
+
         const timestamps = [...splitTimeStamps];
-        timestamps[currUrlIdx][index][type] = getTimeStampfromOffset(position);
+        timestamps[currUrlIdx][index][type] = currTimestamp;
 
         setSplitTimeStamps(timestamps);
 
@@ -142,6 +145,12 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
     }
 
     const handleMouseMove = throttle((index: number, position: number, type: 'start' | 'end') => {
+        const currTimestamp = getTimeStampfromOffset(position);
+        // Set the video timestamp too
+        if(videoRef?.current?.currentTime !== null && videoRef?.current?.currentTime !== undefined){
+            videoRef.current.currentTime = currTimestamp;
+        }
+
         setMouseMoveData({
             index,
             position,
@@ -176,7 +185,6 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
                         right={mouseMoveData?.type === 'end' ? mouseMoveData?.position : getOffsetFromTimestamp(end)}
                         onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)}
                         onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)}
-                        onMouseMove={(position: number, type: 'start' | 'end') => handleMouseMove(index, position, type)}
                         key={`cropped-section-${currUrlIdx}-${index}`}
                     />
                 }
@@ -186,7 +194,6 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
                         right={getOffsetFromTimestamp(end)}
                         onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)}
                         onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)}
-                        onMouseMove={() => { }}
                         key={`cropped-section-${currUrlIdx}-${index}`}
                     />
                 )
