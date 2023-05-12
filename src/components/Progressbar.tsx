@@ -18,8 +18,10 @@ type CropperSectionProps = {
     right: number,
     onMouseDown: (position: number, type: 'start' | 'end') => void,
     onMouseUp: (position: number, type: 'start' | 'end') => void,
+    onMouseMove: (position: number, type: 'start' | 'end') => void,
 }
 
+var throttle = require('lodash/throttle');
 
 export default function Progressbar({ videoDuration }: { videoDuration: number | undefined }) {
     const ctx = useContext(StateContext);
@@ -35,7 +37,7 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
     }, [progressRef.current?.getBoundingClientRect()]);
 
 
-    function CroppedSection({ left, right, onMouseDown, onMouseUp }: CropperSectionProps) {
+    function CroppedSection({ left, right, onMouseDown, onMouseUp, onMouseMove }: CropperSectionProps) {
         const boundingRect = progressRef.current?.getBoundingClientRect();
         const width = right - left - 17;
         if (boundingRect !== null && boundingRect !== undefined) {
@@ -44,12 +46,14 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
                     <div className="start-grabber"
                         onMouseDown={(event) => onMouseDown(Math.abs(event.clientX - boundingRect?.left), 'start')}
                         onMouseUp={(event) => onMouseUp(Math.abs(event.clientX - boundingRect?.left), 'start')}
+                        onMouseMove={(event) => onMouseMove(Math.abs(event.clientX - boundingRect?.left), 'start')}
                     >
                         <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
                     </div>
                     <div className="end-grabber"
                         onMouseDown={(event) => onMouseDown(Math.abs(boundingRect?.left - event.clientX), 'end')}
                         onMouseUp={(event) => onMouseUp(Math.abs(boundingRect?.left - event.clientX), 'end')}
+                        onMouseMove={(event) => onMouseMove(Math.abs(boundingRect?.left - event.clientX), 'end')}
                     >
                         <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
                     </div>
@@ -93,6 +97,14 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
         setMouseMoveData(null);
     }
 
+    const handleMouseMove = (index: number, position: number, type: 'start' | 'end') => {
+        setMouseMoveData({
+            index,
+            position,
+            type,
+        })
+    }
+
     return (
         <div className="progressbar-container" ref={progressRef}>
             {(imgWidth !== null && videoThumbnails !== null && videoThumbnails[currUrlIdx] !== null) ? (
@@ -104,10 +116,24 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
 
             {(videoDuration !== undefined) && splitTimeStamps[currUrlIdx]?.map(({ start, end }, index) => {
                 if (mouseMoveData?.index === index) {
-                    return <CroppedSection left={mouseMoveData?.type === 'start' ? mouseMoveData?.position : getOffsetFromTimestamp(start)} right={mouseMoveData?.type === 'end' ? mouseMoveData?.position : getOffsetFromTimestamp(end)} onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)} onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)} key={`cropped-section-${currUrlIdx}-${index}`} />
+                    return <CroppedSection
+                        left={mouseMoveData?.type === 'start' ? mouseMoveData?.position : getOffsetFromTimestamp(start)}
+                        right={mouseMoveData?.type === 'end' ? mouseMoveData?.position : getOffsetFromTimestamp(end)}
+                        onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)}
+                        onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)}
+                        onMouseMove={(position: number, type: 'start' | 'end') => handleMouseMove(index, position, type)}
+                        key={`cropped-section-${currUrlIdx}-${index}`}
+                    />
                 }
                 return (
-                    <CroppedSection left={getOffsetFromTimestamp(start)} right={getOffsetFromTimestamp(end)} onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)} onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)} key={`cropped-section-${currUrlIdx}-${index}`} />
+                    <CroppedSection
+                        left={getOffsetFromTimestamp(start)}
+                        right={getOffsetFromTimestamp(end)}
+                        onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)}
+                        onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)}
+                        onMouseMove={() => { }}
+                        key={`cropped-section-${currUrlIdx}-${index}`}
+                    />
                 )
             })}
         </div>
