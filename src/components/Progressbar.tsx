@@ -20,18 +20,6 @@ type CropperSectionProps = {
     onMouseUp: (position: number, type: 'start' | 'end') => void,
 }
 
-function CroppedSection({ left, right, onMouseDown, onMouseUp }: CropperSectionProps) {
-    const width = right - left - 17;
-    return (
-        <div className="cropped-section-left" style={{ left: `${left}px`, width: `${width}px` }}>
-            <div className="start-grabber" onMouseDown={(event) => onMouseDown(event.clientX, 'start')} onMouseUp={(event) => onMouseUp(event.clientX, 'start')}>
-                <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
-            </div>
-            <div className="end-grabber" onMouseDown={(event) => onMouseDown(event.clientX, 'end')} onMouseUp={(event) => onMouseUp(event.clientX, 'end')}>
-                <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
-            </div>
-        </div>)
-}
 
 export default function Progressbar({ videoDuration }: { videoDuration: number | undefined }) {
     const ctx = useContext(StateContext);
@@ -44,7 +32,31 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
         if (boundingRect !== null && boundingRect !== undefined && boundingRect?.width !== imgWidth && progressRef?.current !== undefined) {
             setimgWidth(boundingRect.width / PROGRESSBAR_IMAGES_COUNT);
         }
-    }, [progressRef.current?.getBoundingClientRect()])
+    }, [progressRef.current?.getBoundingClientRect()]);
+
+
+    function CroppedSection({ left, right, onMouseDown, onMouseUp }: CropperSectionProps) {
+        const boundingRect = progressRef.current?.getBoundingClientRect();
+        const width = right - left - 17;
+        if (boundingRect !== null && boundingRect !== undefined) {
+            return (
+                <div className="cropped-section-left" style={{ left: `${left}px`, width: `${width}px` }}>
+                    <div className="start-grabber"
+                        onMouseDown={(event) => onMouseDown(Math.abs(event.clientX - boundingRect?.left), 'start')}
+                        onMouseUp={(event) => onMouseUp(Math.abs(event.clientX - boundingRect?.left), 'start')}
+                    >
+                        <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
+                    </div>
+                    <div className="end-grabber"
+                        onMouseDown={(event) => onMouseDown(Math.abs(boundingRect?.left - event.clientX), 'end')}
+                        onMouseUp={(event) => onMouseUp(Math.abs(boundingRect?.left - event.clientX), 'end')}
+                    >
+                        <FontAwesomeIcon icon={faGripLinesVertical} className="grip-icon" />
+                    </div>
+                </div>)
+        }
+        return null;
+    }
 
 
     if (ctx === null || ctx === undefined) {
@@ -84,7 +96,7 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
     return (
         <div className="progressbar-container" ref={progressRef}>
             {(imgWidth !== null && videoThumbnails !== null && videoThumbnails[currUrlIdx] !== null) ? (
-                videoThumbnails[currUrlIdx]?.thumbnails.map((img, index) => (<img src={img} style={{ width: imgWidth, height: '4rem', objectFit: 'cover', borderTopLeftRadius: (index === 0 ? 10 : 0), borderBottomLeftRadius: (index === 0 ? 10 : 0), borderTopRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, borderBottomRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0 }} />))
+                videoThumbnails[currUrlIdx]?.thumbnails.map((img, index) => (<img src={img} style={{ width: imgWidth, height: '4rem', objectFit: 'cover', borderTopLeftRadius: (index === 0 ? 10 : 0), borderBottomLeftRadius: (index === 0 ? 10 : 0), borderTopRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, borderBottomRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0 }} key={`preview-image-${currUrlIdx}-${index}`} />))
             )
                 :
                 <Shimmer width={500} height={64} className="progressbar-container" />
