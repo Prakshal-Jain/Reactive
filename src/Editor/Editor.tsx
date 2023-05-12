@@ -97,14 +97,24 @@ export default function () {
         }
     }, 500, { leading: false });
 
-    const setPlayPause = () => {
-        if (isPlaying) {
-            videoRef?.current?.pause();
+    const setPlayPause = (always: 'play' | 'pause' | null = null): void => {
+        if(always === null){
+            if (isPlaying) {
+                videoRef?.current?.pause();
+            }
+            else {
+                videoRef?.current?.play();
+            }
+            setIsPlaying(!isPlaying);
         }
-        else {
+        else if(always === 'play'){
             videoRef?.current?.play();
+            setIsPlaying(true);
         }
-        setIsPlaying(!isPlaying);
+        else{
+            videoRef?.current?.pause();
+            setIsPlaying(false);
+        }
     }
 
     const updateProgress = (offset: number) => {
@@ -123,7 +133,7 @@ export default function () {
                     // onLoadedData={(e) => console.log(e)}
                     className={`video-element ${isPortrait ? 'portrait' : 'landscape'}`}
                     muted={isMuted}
-                    onClick={setPlayPause}
+                    onClick={() => setPlayPause(null)}
                     key={`${videoThumbnails[currUrlIdx]?.name}-${currUrlIdx}-video-element`}
                 >
                     <source src={sourceURLs[currUrlIdx]} type='video/mp4' />
@@ -136,7 +146,7 @@ export default function () {
                         </div>
                     )}
 
-                    <Progressbar videoRef={videoRef} />
+                    <Progressbar videoRef={videoRef} setPlayPause={setPlayPause} />
 
                     {/* <div
                         className='progressbar-base'
@@ -153,7 +163,7 @@ export default function () {
                         <button className='control-btn' title='Mute/Unmute Video' onClick={() => setIsMuted(!isMuted)}>{isMuted ? <FontAwesomeIcon icon={faVolumeMute} className='control-icon' /> : <FontAwesomeIcon icon={faVolumeUp} className='control-icon' />}</button>
                     </div>
                     <div className="controls-group">
-                        <button className='control-btn' title='Play/Pause Video' onClick={setPlayPause}>{isPlaying ? <FontAwesomeIcon icon={faPause} className='control-icon' /> : <FontAwesomeIcon icon={faPlay} className='control-icon' />}</button>
+                        <button className='control-btn' title='Play/Pause Video' onClick={() => setPlayPause(null)}>{isPlaying ? <FontAwesomeIcon icon={faPause} className='control-icon' /> : <FontAwesomeIcon icon={faPlay} className='control-icon' />}</button>
                     </div>
                 </div>
 

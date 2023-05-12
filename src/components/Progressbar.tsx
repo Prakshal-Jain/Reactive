@@ -22,7 +22,7 @@ type CropperSectionProps = {
 
 var throttle = require('lodash/throttle');
 
-export default function Progressbar({ videoRef }: { videoRef: any }) {
+export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any, setPlayPause: (always: ('play' | 'pause' | null)) => void }) {
     const ctx = useContext(StateContext);
     const progressRef = useRef<HTMLDivElement>(null);
     const [imgWidth, setimgWidth] = useState<number | null>(null);
@@ -147,6 +147,7 @@ export default function Progressbar({ videoRef }: { videoRef: any }) {
     const handleMouseMove = throttle((index: number, position: number, type: 'start' | 'end') => {
         const currTimestamp = getTimeStampfromOffset(position);
         // Set the video timestamp too
+        setPlayPause('pause')
         if(videoRef?.current?.currentTime !== null && videoRef?.current?.currentTime !== undefined){
             videoRef.current.currentTime = currTimestamp;
         }
