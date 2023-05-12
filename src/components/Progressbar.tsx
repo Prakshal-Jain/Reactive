@@ -90,10 +90,15 @@ export default function Progressbar({ videoDuration }: { videoDuration: number |
                 <Shimmer width={500} height={64} className="progressbar-container" />
             }
 
-            {(videoDuration !== undefined) && splitTimeStamps[currUrlIdx]?.map(({ start, end }, index) => (
-                <CroppedSection left={getOffsetFromTimestamp(start)} right={getOffsetFromTimestamp(end)} onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)} onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)} key={`cropped-section-${currUrlIdx}-${index}`} />
-            ))}
-            </div>
+            {(videoDuration !== undefined) && splitTimeStamps[currUrlIdx]?.map(({ start, end }, index) => {
+                if (mouseMoveData?.index === index) {
+                    return <CroppedSection left={mouseMoveData?.type === 'start' ? mouseMoveData?.position : getOffsetFromTimestamp(start)} right={mouseMoveData?.type === 'end' ? mouseMoveData?.position : getOffsetFromTimestamp(end)} onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)} onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)} key={`cropped-section-${currUrlIdx}-${index}`} />
+                }
+                return (
+                    <CroppedSection left={getOffsetFromTimestamp(start)} right={getOffsetFromTimestamp(end)} onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)} onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)} key={`cropped-section-${currUrlIdx}-${index}`} />
+                )
+            })}
+        </div>
     )
-                
+
 }
