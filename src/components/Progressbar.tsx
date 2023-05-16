@@ -1,9 +1,10 @@
 import "./progressbar.css";
-import { MouseEventHandler, SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { StateContext, StateContextType } from '../state_context';
 import { Shimmer } from "react-shimmer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGripLines, faGripLinesVertical, faGripVertical } from "@fortawesome/free-solid-svg-icons";
+import { faGripLinesVertical } from "@fortawesome/free-solid-svg-icons";
+import { useLongPress } from 'use-long-press';
 
 type Props = {
     currUrlIdx: number,
@@ -11,13 +12,16 @@ type Props = {
     PROGRESSBAR_IMAGES_COUNT: StateContextType['PROGRESSBAR_IMAGES_COUNT'],
     splitTimeStamps: StateContextType['splitTimeStamps'],
     setSplitTimeStamps: StateContextType['setSplitTimeStamps'],
+    theme: StateContextType['theme'],
 }
 
 type CropperSectionProps = {
     left: number,
     right: number,
-    onMouseDown: (position: number, type: 'start' | 'end') => void,
-    onMouseUp: (position: number, type: 'start' | 'end') => void,
+    onMouseDown: (position: number, type: 'start' | 'end' | 'both') => void,
+    onMouseUp: (position: number, type: 'start' | 'end' | 'both') => void,
+    index: number,
+    ref: any,
 }
 
 var throttle = require('lodash/throttle');
@@ -25,8 +29,9 @@ var throttle = require('lodash/throttle');
 export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any, setPlayPause: (always: ('play' | 'pause' | null)) => void }) {
     const ctx = useContext(StateContext);
     const progressRef = useRef<HTMLDivElement>(null);
+    const activeSegmentRef = useRef<HTMLDivElement>(null);
     const [imgWidth, setimgWidth] = useState<number | null>(null);
-    const [mouseMoveData, setMouseMoveData] = useState<{ index: number, type: 'start' | 'end', position: number } | null>(null)
+    const [mouseMoveData, setMouseMoveData] = useState<{ index: number, type: 'start' | 'end' | 'both', position: number, initialPosition?: number } | null>(null)
     const [windowDimensions, setWindowDimensions] = useState<{ height: number, width: number }>({
         height: window.innerHeight,
         width: window.innerWidth
@@ -45,7 +50,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         document.addEventListener('mouseup', handleMouseUpOutsideProgressBar);
 
         return () => document.removeEventListener('mouseup', handleMouseUpOutsideProgressBar);
-    })
+    }, []);
 
     useEffect(() => {
         window.addEventListener('resize', handleResize)
@@ -54,29 +59,43 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
     }, [window.innerHeight, window.innerWidth])
 
 
-    const handleResize = throttle(() => {
-        if ((Math.abs(window.innerHeight - windowDimensions.height) > 10) || (Math.abs(window.innerWidth - windowDimensions.width) > 10)) {
-            setWindowDimensions({
-                height: window.innerHeight,
-                width: window.innerWidth
-            })
-        }
-    }, 300);
 
-    function handleMouseUpOutsideProgressBar(event: any): void {
-        // When cursor leaves the container and pressed out, save the progress.
-        if (progressRef && (!progressRef?.current?.contains(event.target)) && mouseMoveData !== null) {
-            handleMouseUp(mouseMoveData?.index, mouseMoveData?.position, mouseMoveData?.type);
+    const onLongPressSegment = useLongPress((event: any, { context }: any) => {
+        if (mouseMoveData !== null) {
+            return;
         }
+
+        const boundingRect = progressRef.current?.getBoundingClientRect();
+
+        if (videoDuration === undefined || boundingRect === null || boundingRect === undefined) {
+            return;
+        }
+
+        setMouseMoveData({ index: context.index, type: 'both', position: Math.abs(event.clientX - boundingRect?.left), initialPosition: Math.abs(event.clientX - boundingRect?.left) });
+    });
+
+    const handleLongPressSegmentMouseUp = (index: number, position: number, type: 'start' | 'end' | 'both') => {
+        if (mouseMoveData === null || type !== 'both') {
+            return;
+        }
+
+        // Set timestamps here
+
+        setMouseMoveData(null);
     }
 
-
-    function CroppedSection({ left, right, onMouseDown, onMouseUp }: CropperSectionProps) {
+    function CroppedSection({ left, right, onMouseDown, onMouseUp, index, ref }: CropperSectionProps) {
         const boundingRect = progressRef.current?.getBoundingClientRect();
         const width = right - left - 17;
         if (boundingRect !== null && boundingRect !== undefined) {
             return (
-                <div className="cropped-section-left" style={{ left: `${left}px`, width: `${width}px` }}>
+                <div
+                    {...onLongPressSegment({ index })}
+                    onMouseUp={(event) => handleLongPressSegmentMouseUp(index, Math.abs(event.clientX - boundingRect?.left), 'both')}
+                    className={`cropped-section theme-${theme} ${(mouseMoveData !== null && mouseMoveData?.type === 'both') && 'cropped-section-active'}`} 
+                    style={{ left: `${left}px`, width: `${width}px` }}
+                    ref={ref}
+                >
                     <div className="start-grabber"
                         onMouseDown={(event) => onMouseDown(Math.abs(event.clientX - boundingRect?.left), 'start')}
                         onMouseUp={(event) => onMouseUp(Math.abs(event.clientX - boundingRect?.left), 'start')}
@@ -99,7 +118,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         return null;
     }
 
-    const { videoThumbnails, currUrlIdx, splitTimeStamps, setSplitTimeStamps, PROGRESSBAR_IMAGES_COUNT }: Props = ctx;
+    const { videoThumbnails, currUrlIdx, splitTimeStamps, setSplitTimeStamps, PROGRESSBAR_IMAGES_COUNT, theme }: Props = ctx;
 
     const getOffsetFromTimestamp = (timestamp: number) => {
         const boundingRect = progressRef.current?.getBoundingClientRect();
@@ -107,18 +126,6 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
             return (timestamp / videoDuration) * boundingRect?.width;
         }
         return 50;
-    }
-
-    const handleMouseDown = (index: number, position: number, type: 'start' | 'end') => {
-        if (mouseMoveData !== null) {
-            return;
-        }
-
-        setMouseMoveData({
-            index,
-            position,
-            type,
-        })
     }
 
     const getTimeStampfromOffset = (position: number): number => {
@@ -129,8 +136,40 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         return 0;
     }
 
-    const handleMouseUp = (index: number, position: number, type: 'start' | 'end') => {
-        if (mouseMoveData === null) {
+    const handleResize = throttle(() => {
+        if ((Math.abs(window.innerHeight - windowDimensions.height) > 10) || (Math.abs(window.innerWidth - windowDimensions.width) > 10)) {
+            setWindowDimensions({
+                height: window.innerHeight,
+                width: window.innerWidth
+            })
+        }
+    }, 300);
+
+    function handleMouseUpOutsideProgressBar(event: any): void {
+        // BUG: mouseMoveData setting to null
+        // When cursor leaves the container and pressed out, save the progress.
+        if (progressRef && (!progressRef?.current?.contains(event.target)) && mouseMoveData !== null && mouseMoveData?.type !== 'both') {
+            handleMouseUp(mouseMoveData?.index, mouseMoveData?.position, mouseMoveData?.type);
+        }
+        else if(activeSegmentRef && (!activeSegmentRef?.current?.contains(event.target)) && mouseMoveData !== null && mouseMoveData?.type === 'both'){
+            handleLongPressSegmentMouseUp(mouseMoveData?.index, mouseMoveData?.position, 'both');
+        }
+    }
+
+    const handleMouseDown = (index: number, position: number, type: 'start' | 'end' | 'both') => {
+        if (mouseMoveData !== null || type === 'both') {
+            return;
+        }
+
+        setMouseMoveData({
+            index,
+            position,
+            type,
+        })
+    }
+
+    const handleMouseUp = (index: number, position: number, type: 'start' | 'end' | 'both') => {
+        if (mouseMoveData === null || type === 'both') {
             return;
         }
 
@@ -144,11 +183,15 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         setMouseMoveData(null);
     }
 
-    const handleMouseMove = throttle((index: number, position: number, type: 'start' | 'end') => {
+    const handleMouseMove = throttle((index: number, position: number, type: 'start' | 'end' | 'both') => {
+        if (mouseMoveData === null || type === 'both') {
+            return;
+        }
+
         const currTimestamp = getTimeStampfromOffset(position);
         // Set the video timestamp too
         setPlayPause('pause')
-        if(videoRef?.current?.currentTime !== null && videoRef?.current?.currentTime !== undefined){
+        if (videoRef?.current?.currentTime !== null && videoRef?.current?.currentTime !== undefined) {
             videoRef.current.currentTime = currTimestamp;
         }
 
@@ -184,18 +227,22 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
                     return <CroppedSection
                         left={mouseMoveData?.type === 'start' ? mouseMoveData?.position : getOffsetFromTimestamp(start)}
                         right={mouseMoveData?.type === 'end' ? mouseMoveData?.position : getOffsetFromTimestamp(end)}
-                        onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)}
-                        onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)}
+                        onMouseDown={(position: number, type: 'start' | 'end' | 'both') => handleMouseDown(index, position, type)}
+                        onMouseUp={(position: number, type: 'start' | 'end' | 'both') => handleMouseUp(index, position, type)}
                         key={`cropped-section-${currUrlIdx}-${index}`}
+                        index={index}
+                        ref={activeSegmentRef}
                     />
                 }
                 return (
                     <CroppedSection
                         left={getOffsetFromTimestamp(start)}
                         right={getOffsetFromTimestamp(end)}
-                        onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)}
-                        onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)}
+                        onMouseDown={(position: number, type: 'start' | 'end' | 'both') => handleMouseDown(index, position, type)}
+                        onMouseUp={(position: number, type: 'start' | 'end' | 'both') => handleMouseUp(index, position, type)}
                         key={`cropped-section-${currUrlIdx}-${index}`}
+                        index={index}
+                        ref={null}
                     />
                 )
             })}

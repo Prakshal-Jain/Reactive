@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { faPause, faPlay, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
+import { faGripLinesVertical, faPause, faPlay, faPlus, faSquare, faSquareFull, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useRef } from 'react';
@@ -121,6 +121,10 @@ export default function () {
         const seekTime = getSeekTimeFromOffset(offset);
         videoRef?.current?.pause();
         setIsPlaying(false);
+    }
+
+    const addSegment = () => {
+        // Add a video segment --> find more natural UX way to do this
     }
 
     return (
