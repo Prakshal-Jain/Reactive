@@ -151,7 +151,10 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         if (videoRef?.current?.currentTime !== null && videoRef?.current?.currentTime !== undefined) {
             videoRef.current.currentTime = currTimestamp;
         }
-        // Check if the inside > end (x-axis), and do not change the mouseMoveData.
+        // Check if the end doesn't exceed the maximum video duration.
+        if(type === 'end' && currTimestamp > videoDuration){
+            return;
+        }
 
         setMouseMoveData({
             index,
