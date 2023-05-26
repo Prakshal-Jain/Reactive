@@ -23,30 +23,34 @@ function App() {
     if (sourceURLs.length === 0) {
       return;
     }
-    else if (sourceURLs.length === 1) {
-      setSourceUrls([]);
-      setVideoThumbnails([]);
-      setCurrUrlidx(0);
-      setShowEditor(false);
-      setSplitTimeStamps([]);
-      return;
-    }
     else {
-      if (currUrlIdx === index && currUrlIdx === (sourceURLs.length - 1)) {
-        setCurrUrlidx(index - 1);
+      const confirmationDialog = window.confirm("Are you sure you want to delete this video?\nAll your progress will be lost for this video.");
+      if (confirmationDialog === true) {
+        if (sourceURLs.length === 1) {
+          setSourceUrls([]);
+          setVideoThumbnails([]);
+          setCurrUrlidx(0);
+          setShowEditor(false);
+          setSplitTimeStamps([]);
+        }
+        else {
+          if (currUrlIdx === index && currUrlIdx === (sourceURLs.length - 1)) {
+            setCurrUrlidx(index - 1);
+          }
+
+          const urls = [...sourceURLs];
+          urls.splice(index, 1);
+          setSourceUrls(urls);
+
+          const thumbnails = [...videoThumbnails];
+          thumbnails.splice(index, 1);
+          setVideoThumbnails(thumbnails);
+
+          const splits = [...splitTimeStamps];
+          splits.splice(index, 1);
+          setSplitTimeStamps(splits);
+        }
       }
-
-      const urls = [...sourceURLs];
-      urls.splice(index, 1);
-      setSourceUrls(urls);
-
-      const thumbnails = [...videoThumbnails];
-      thumbnails.splice(index, 1);
-      setVideoThumbnails(thumbnails);
-
-      const splits = [...splitTimeStamps];
-      splits.splice(index, 1);
-      setSplitTimeStamps(splits);
     }
   }
 

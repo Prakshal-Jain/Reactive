@@ -148,9 +148,10 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         const currTimestamp = getTimeStampfromOffset(position);
         // Set the video timestamp too
         setPlayPause('pause')
-        if(videoRef?.current?.currentTime !== null && videoRef?.current?.currentTime !== undefined){
+        if (videoRef?.current?.currentTime !== null && videoRef?.current?.currentTime !== undefined) {
             videoRef.current.currentTime = currTimestamp;
         }
+        // Check if the inside > end (x-axis), and do not change the mouseMoveData.
 
         setMouseMoveData({
             index,
@@ -173,7 +174,17 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
             key={`progressbar-${currUrlIdx}-width_${windowDimensions.width}-height_${windowDimensions.height}`}
         >
             {(imgWidth !== null && videoThumbnails !== null && videoThumbnails[currUrlIdx] !== null) ? (
-                videoThumbnails[currUrlIdx]?.thumbnails.map((img, index) => (<img src={img} style={{ width: imgWidth, height: '4rem', objectFit: 'cover', borderTopLeftRadius: (index === 0 ? 10 : 0), borderBottomLeftRadius: (index === 0 ? 10 : 0), borderTopRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, borderBottomRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0 }} key={`preview-image-${currUrlIdx}-${index}`} />))
+                videoThumbnails[currUrlIdx]?.thumbnails.map((img, index) => (
+                    <div
+                        style={{ width: imgWidth, height: '4rem', objectFit: 'cover', borderTopLeftRadius: (index === 0 ? 10 : 0), borderBottomLeftRadius: (index === 0 ? 10 : 0), borderTopRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, borderBottomRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, backgroundImage: `url("${img}")`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}
+                        key={`preview-image-${currUrlIdx}-${index}`}
+                    >
+                        {/* <img src={img}
+                            style={{ width: imgWidth, height: '4rem', objectFit: 'cover', borderTopLeftRadius: (index === 0 ? 10 : 0), borderBottomLeftRadius: (index === 0 ? 10 : 0), borderTopRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, borderBottomRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0 }}
+                            key={`preview-image-${currUrlIdx}-${index}`}
+                        /> */}
+                    </div>
+                ))
             )
                 :
                 <Shimmer width={500} height={64} className="progressbar-container" />
