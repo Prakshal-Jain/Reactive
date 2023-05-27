@@ -76,7 +76,10 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         const width = right - left - 17;
         if (boundingRect !== null && boundingRect !== undefined) {
             return (
-                <div className="cropped-section" style={{ left: `${left}px`, width: `${width}px` }}>
+                <div
+                    className="cropped-section" style={{ left: `${left}px`, width: `${width}px` }}
+                    onMouseDown={e => { e.stopPropagation() }}
+                >
                     <div className="start-grabber"
                         onMouseDown={(event) => onMouseDown(Math.abs(event.clientX - boundingRect?.left), 'start')}
                         onMouseUp={(event) => onMouseUp(Math.abs(event.clientX - boundingRect?.left), 'start')}
@@ -152,7 +155,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
             videoRef.current.currentTime = currTimestamp;
         }
         // Check if the end doesn't exceed the maximum video duration.
-        if(type === 'end' && currTimestamp > videoDuration){
+        if (type === 'end' && currTimestamp > videoDuration) {
             return;
         }
 
@@ -162,6 +165,22 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
             type,
         })
     }, 200)
+
+    const handleAddNewCroppedSection = (event: any): void => {
+        // Start adding a new CroppedSection after checking if it doesn't clash with any existing croppedSection.
+        // Maybe need to check minimum amount of time before adding.
+        // Add the CroppedSection, set first part fixed, and continue with how croppedSections are edited --> Handles the logic
+        const boundingRect = progressRef.current?.getBoundingClientRect();
+
+        if (videoDuration === undefined || mouseMoveData !== null || boundingRect === null || boundingRect === undefined) {
+            return
+        }
+
+        const startTime: number = getTimeStampfromOffset(Math.abs(event.clientX - boundingRect?.left));
+        // Will never exceed or before videoduration because pointer event will not be triggered
+        
+        // TODO: Check and add timestamp here!
+    }
 
     return (
         <div
@@ -175,18 +194,14 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
                 handleMouseMove(mouseMoveData.index, Math.abs(event.clientX - boundingRect?.left), mouseMoveData?.type);
             }}
             key={`progressbar-${currUrlIdx}-width_${windowDimensions.width}-height_${windowDimensions.height}`}
+            onMouseDown={handleAddNewCroppedSection}
         >
             {(imgWidth !== null && videoThumbnails !== null && videoThumbnails[currUrlIdx] !== null) ? (
                 videoThumbnails[currUrlIdx]?.thumbnails.map((img, index) => (
                     <div
                         style={{ width: imgWidth, height: '4rem', objectFit: 'cover', borderTopLeftRadius: (index === 0 ? 10 : 0), borderBottomLeftRadius: (index === 0 ? 10 : 0), borderTopRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, borderBottomRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, backgroundImage: `url("${img}")`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}
                         key={`preview-image-${currUrlIdx}-${index}`}
-                    >
-                        {/* <img src={img}
-                            style={{ width: imgWidth, height: '4rem', objectFit: 'cover', borderTopLeftRadius: (index === 0 ? 10 : 0), borderBottomLeftRadius: (index === 0 ? 10 : 0), borderTopRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0, borderBottomRightRadius: (index === ((videoThumbnails[currUrlIdx]?.thumbnails?.length ?? 1) - 1) ? 10 : 0) ? 10 : 0 }}
-                            key={`preview-image-${currUrlIdx}-${index}`}
-                        /> */}
-                    </div>
+                    />
                 ))
             )
                 :
