@@ -20,6 +20,8 @@ type CropperSectionProps = {
     onMouseUp: (position: number, type: 'start' | 'end') => void,
 }
 
+const addNewCroppedSectionThreshold = 7;
+
 var throttle = require('lodash/throttle');
 
 export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any, setPlayPause: (always: ('play' | 'pause' | null)) => void }) {
@@ -42,6 +44,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
     }, [progressRef.current?.getBoundingClientRect()]);
 
     useEffect(() => {
+        // Check if onMouseUp on a different croppedSection.
         document.addEventListener('mouseup', handleMouseUpOutsideProgressBar);
 
         return () => document.removeEventListener('mouseup', handleMouseUpOutsideProgressBar);
@@ -151,12 +154,16 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         const currTimestamp = getTimeStampfromOffset(position);
         // Set the video timestamp too
         setPlayPause('pause')
+        // Check if the end doesn't exceed the maximum video duration.
+        if (type === 'end' && (currTimestamp > videoDuration || currTimestamp >= (splitTimeStamps[currUrlIdx][index + 1]?.start ?? Infinity) || ((currTimestamp - splitTimeStamps[currUrlIdx][index]?.start) <= addNewCroppedSectionThreshold))) {
+            return;
+        }
+        if (type === 'start' && ((currTimestamp <= splitTimeStamps[currUrlIdx][index - 1]?.end ?? -Infinity) || ((splitTimeStamps[currUrlIdx][index]?.end - currTimestamp) <= addNewCroppedSectionThreshold))) {
+            return;
+        }
+
         if (videoRef?.current?.currentTime !== null && videoRef?.current?.currentTime !== undefined) {
             videoRef.current.currentTime = currTimestamp;
-        }
-        // Check if the end doesn't exceed the maximum video duration.
-        if (type === 'end' && currTimestamp > videoDuration) {
-            return;
         }
 
         setMouseMoveData({
@@ -165,6 +172,27 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
             type,
         })
     }, 200)
+
+    function findTimestampIndexHelper(startTime: number): number | null {
+        const timestamps = splitTimeStamps[currUrlIdx];
+        const endTime = startTime + addNewCroppedSectionThreshold;
+        // Check for start or end
+        if (startTime >= 0 && endTime < timestamps[0].start && (timestamps[0].start - startTime) >= addNewCroppedSectionThreshold) {
+            return 0;
+        }
+
+        else if (endTime <= videoDuration && startTime > timestamps[timestamps.length - 1].end && (videoDuration - timestamps[timestamps.length - 1].end) >= addNewCroppedSectionThreshold) {
+            // Add at end
+            return timestamps.length;
+        }
+
+        for (let i = 1; i < timestamps.length; i++) {
+            if (timestamps[i - 1].end < startTime && timestamps[i].start > endTime && (timestamps[i].start - timestamps[i - 1].end) >= addNewCroppedSectionThreshold) {
+                return i;
+            }
+        }
+        return null;
+    }
 
     const handleAddNewCroppedSection = (event: any): void => {
         // Start adding a new CroppedSection after checking if it doesn't clash with any existing croppedSection.
@@ -178,8 +206,17 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
 
         const startTime: number = getTimeStampfromOffset(Math.abs(event.clientX - boundingRect?.left));
         // Will never exceed or before videoduration because pointer event will not be triggered
-        
-        // TODO: Check and add timestamp here!
+
+        const idx = findTimestampIndexHelper(startTime);
+
+        if (idx === null) {
+            return
+        }
+
+        // BUG: Can add overlapping sections (ends can overlap!)
+        const timestamps = [...splitTimeStamps];
+        timestamps[currUrlIdx]?.splice(idx, 0, { start: startTime, end: startTime + addNewCroppedSectionThreshold })
+        setSplitTimeStamps(timestamps);
     }
 
     return (
