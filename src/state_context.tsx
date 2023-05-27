@@ -15,6 +15,7 @@ export interface StateContextType {
     splitTimeStamps: Array<Array<{ start: number, end: number }>>
     setSplitTimeStamps: (split: StateContextType['splitTimeStamps']) => void,
     PROGRESSBAR_IMAGES_COUNT: number,
+    MAX_VIDEO_LIMIT: number,
 }
 
 export const StateContext = React.createContext<StateContextType | null>(null);

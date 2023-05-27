@@ -76,7 +76,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         const width = right - left - 17;
         if (boundingRect !== null && boundingRect !== undefined) {
             return (
-                <div className="cropped-section-left" style={{ left: `${left}px`, width: `${width}px` }}>
+                <div className="cropped-section" style={{ left: `${left}px`, width: `${width}px` }}>
                     <div className="start-grabber"
                         onMouseDown={(event) => onMouseDown(Math.abs(event.clientX - boundingRect?.left), 'start')}
                         onMouseUp={(event) => onMouseUp(Math.abs(event.clientX - boundingRect?.left), 'start')}

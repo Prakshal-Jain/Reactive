@@ -20,6 +20,7 @@ type Props = {
     setCurrUrlidx: (idx: number) => void,
     splitTimeStamps: StateContextType['splitTimeStamps'],
     setSplitTimeStamps: StateContextType['setSplitTimeStamps'],
+    MAX_VIDEO_LIMIT: StateContextType['MAX_VIDEO_LIMIT'],
 }
 
 export default function () {
@@ -31,7 +32,7 @@ export default function () {
         return null;
     }
 
-    const { sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, removeVideo, setShowEditor, currUrlIdx, setCurrUrlidx, splitTimeStamps, setSplitTimeStamps }: Props = ctx;
+    const { sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, removeVideo, setShowEditor, currUrlIdx, setCurrUrlidx, splitTimeStamps, setSplitTimeStamps, MAX_VIDEO_LIMIT }: Props = ctx;
 
     useEffect(() => {
         document.addEventListener('drop', function (e) {
@@ -41,7 +42,7 @@ export default function () {
     }, []);
 
     const uploadVideo = async (files: (FileList | null)) => {
-        const allFiles = Array.from(files ?? []);
+        const allFiles = Array.from(files ?? []).slice(0, MAX_VIDEO_LIMIT);
 
         const thumbnails: Array<{ thumbnails: Array<string>, name: string, type: string } | null> = Array(allFiles.length).fill(null);
         const toUpload: Array<string> = allFiles.map((v, i) => {

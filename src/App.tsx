@@ -55,7 +55,7 @@ function App() {
   }
 
   return (
-    <StateContext.Provider value={{ theme, setTheme, showEditor, setShowEditor, sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, currUrlIdx, setCurrUrlidx, removeVideo, splitTimeStamps, setSplitTimeStamps, PROGRESSBAR_IMAGES_COUNT }} >
+    <StateContext.Provider value={{ theme, setTheme, showEditor, setShowEditor, sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, currUrlIdx, setCurrUrlidx, removeVideo, splitTimeStamps, setSplitTimeStamps, PROGRESSBAR_IMAGES_COUNT, MAX_VIDEO_LIMIT }} >
       <div className={`${theme}-theme-bg page-container`}>
         <div className="video-editor-container">
           {/* Add editor here */}

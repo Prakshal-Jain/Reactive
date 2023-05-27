@@ -16,6 +16,7 @@ type Props = {
     setCurrUrlidx: (idx: number) => void,
     splitTimeStamps: StateContextType['splitTimeStamps'],
     setSplitTimeStamps: StateContextType['setSplitTimeStamps'],
+    MAX_VIDEO_LIMIT: StateContextType['MAX_VIDEO_LIMIT'],
 }
 
 export default function () {
@@ -27,10 +28,10 @@ export default function () {
         return null;
     }
 
-    const { videoThumbnails, removeVideo, sourceURLs, setSourceUrls, setVideoThumbnails, currUrlIdx, setCurrUrlidx, setSplitTimeStamps, splitTimeStamps }: Props = ctx;
+    const { videoThumbnails, removeVideo, sourceURLs, setSourceUrls, setVideoThumbnails, currUrlIdx, setCurrUrlidx, setSplitTimeStamps, splitTimeStamps, MAX_VIDEO_LIMIT }: Props = ctx;
 
     const addNewVideo = async (files: (FileList | null)) => {
-        if (files === null) {
+        if (files === null || ((files.length + sourceURLs.length) > MAX_VIDEO_LIMIT)) {
             return;
         }
 
