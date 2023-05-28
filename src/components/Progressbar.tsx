@@ -3,7 +3,7 @@ import { MouseEventHandler, SyntheticEvent, useContext, useEffect, useRef, useSt
 import { StateContext, StateContextType } from '../state_context';
 import { Shimmer } from "react-shimmer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGripLines, faGripLinesVertical, faGripVertical } from "@fortawesome/free-solid-svg-icons";
+import { faGripLinesVertical } from "@fortawesome/free-solid-svg-icons";
 
 type Props = {
     currUrlIdx: number,
@@ -11,6 +11,7 @@ type Props = {
     PROGRESSBAR_IMAGES_COUNT: StateContextType['PROGRESSBAR_IMAGES_COUNT'],
     splitTimeStamps: StateContextType['splitTimeStamps'],
     setSplitTimeStamps: StateContextType['setSplitTimeStamps'],
+    setMessage: StateContextType['setMessage'],
 }
 
 type CropperSectionProps = {
@@ -18,13 +19,14 @@ type CropperSectionProps = {
     right: number,
     onMouseDown: (position: number, type: 'start' | 'end') => void,
     onMouseUp: (position: number, type: 'start' | 'end') => void,
+    isActive: boolean,
 }
 
 const addNewCroppedSectionThreshold = 7;
 
 var throttle = require('lodash/throttle');
 
-export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any, setPlayPause: (always: ('play' | 'pause' | null)) => void }) {
+export default function Progressbar({ videoRef, setPlayPause, isAddCroppedSection, setIsAddCroppedSection }: { videoRef: any, setPlayPause: (always: ('play' | 'pause' | null)) => void, isAddCroppedSection: boolean, setIsAddCroppedSection: (add: boolean) => void }) {
     const ctx = useContext(StateContext);
     const progressRef = useRef<HTMLDivElement>(null);
     const [imgWidth, setimgWidth] = useState<number | null>(null);
@@ -44,7 +46,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
     }, [progressRef.current?.getBoundingClientRect()]);
 
     useEffect(() => {
-        // Check if onMouseUp on a different croppedSection.
+        // Check if onMouseUp on a different croppedSection or outside of any croppedSection.
         document.addEventListener('mouseup', handleMouseUpOutsideProgressBar);
 
         return () => document.removeEventListener('mouseup', handleMouseUpOutsideProgressBar);
@@ -74,14 +76,19 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
     }
 
 
-    function CroppedSection({ left, right, onMouseDown, onMouseUp }: CropperSectionProps) {
+    function CroppedSection({ left, right, onMouseDown, onMouseUp, isActive }: CropperSectionProps) {
         const boundingRect = progressRef.current?.getBoundingClientRect();
         const width = right - left - 17;
         if (boundingRect !== null && boundingRect !== undefined) {
             return (
                 <div
                     className="cropped-section" style={{ left: `${left}px`, width: `${width}px` }}
-                    onMouseDown={e => { e.stopPropagation() }}
+                    onMouseDown={e => e.stopPropagation()}
+                    onMouseUp={() => {
+                        if (mouseMoveData !== null && isActive === false) {
+                            handleMouseUp(mouseMoveData.index, mouseMoveData.position, mouseMoveData.type);
+                        }
+                    }}
                 >
                     <div className="start-grabber"
                         onMouseDown={(event) => onMouseDown(Math.abs(event.clientX - boundingRect?.left), 'start')}
@@ -105,7 +112,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         return null;
     }
 
-    const { videoThumbnails, currUrlIdx, splitTimeStamps, setSplitTimeStamps, PROGRESSBAR_IMAGES_COUNT }: Props = ctx;
+    const { videoThumbnails, currUrlIdx, splitTimeStamps, setSplitTimeStamps, PROGRESSBAR_IMAGES_COUNT, setMessage }: Props = ctx;
 
     const getOffsetFromTimestamp = (timestamp: number) => {
         const boundingRect = progressRef.current?.getBoundingClientRect();
@@ -141,6 +148,12 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         }
 
         const currTimestamp = getTimeStampfromOffset(position);
+        if (type === 'start' && currTimestamp < (splitTimeStamps[currUrlIdx][index - 1]?.end ?? 0)) {
+            position = mouseMoveData.position;
+        }
+        else if (type === 'end' && currTimestamp > (splitTimeStamps[currUrlIdx][index + 1]?.start ?? videoDuration)) {
+            position = mouseMoveData.position;
+        }
 
         const timestamps = [...splitTimeStamps];
         timestamps[currUrlIdx][index][type] = currTimestamp;
@@ -198,9 +211,11 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         // Start adding a new CroppedSection after checking if it doesn't clash with any existing croppedSection.
         // Maybe need to check minimum amount of time before adding.
         // Add the CroppedSection, set first part fixed, and continue with how croppedSections are edited --> Handles the logic
+        setIsAddCroppedSection(false);
         const boundingRect = progressRef.current?.getBoundingClientRect();
 
         if (videoDuration === undefined || mouseMoveData !== null || boundingRect === null || boundingRect === undefined) {
+            setMessage({type: 'error', title: 'Cannot add a new section', content: 'Something went wrong. Please try again.'});
             return
         }
 
@@ -210,6 +225,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
         const idx = findTimestampIndexHelper(startTime);
 
         if (idx === null) {
+            setMessage({type: 'error', title: 'Cannot add a new section', content: "Please make sure you click on the part of progress bar that is not already a section."})
             return
         }
 
@@ -231,7 +247,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
                 handleMouseMove(mouseMoveData.index, Math.abs(event.clientX - boundingRect?.left), mouseMoveData?.type);
             }}
             key={`progressbar-${currUrlIdx}-width_${windowDimensions.width}-height_${windowDimensions.height}`}
-            onMouseDown={handleAddNewCroppedSection}
+            onClick={handleAddNewCroppedSection}
         >
             {(imgWidth !== null && videoThumbnails !== null && videoThumbnails[currUrlIdx] !== null) ? (
                 videoThumbnails[currUrlIdx]?.thumbnails.map((img, index) => (
@@ -253,6 +269,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
                         onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)}
                         onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)}
                         key={`cropped-section-${currUrlIdx}-${index}`}
+                        isActive={true}
                     />
                 }
                 return (
@@ -262,6 +279,7 @@ export default function Progressbar({ videoRef, setPlayPause }: { videoRef: any,
                         onMouseDown={(position: number, type: 'start' | 'end') => handleMouseDown(index, position, type)}
                         onMouseUp={(position: number, type: 'start' | 'end') => handleMouseUp(index, position, type)}
                         key={`cropped-section-${currUrlIdx}-${index}`}
+                        isActive={false}
                     />
                 )
             })}

@@ -6,7 +6,8 @@ import './App.css';
 import Uploader from './Editor/Uploader';
 import Editor from './Editor/Editor';
 import { StateContext, StateContextType } from './state_context';
-import { useEffect } from 'react';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 const MAX_VIDEO_LIMIT: number = 5;
 const PROGRESSBAR_IMAGES_COUNT: number = 10;
@@ -18,6 +19,7 @@ function App() {
   const [videoThumbnails, setVideoThumbnails] = useState<StateContextType['videoThumbnails']>([]);
   const [currUrlIdx, setCurrUrlidx] = useState<StateContextType['currUrlIdx']>(0);
   const [splitTimeStamps, setSplitTimeStamps] = useState<StateContextType['splitTimeStamps']>([]);
+  const [message, setMessage] = useState<StateContextType['message']>(null);
 
   const removeVideo = (index: number) => {
     if (sourceURLs.length === 0) {
@@ -55,7 +57,7 @@ function App() {
   }
 
   return (
-    <StateContext.Provider value={{ theme, setTheme, showEditor, setShowEditor, sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, currUrlIdx, setCurrUrlidx, removeVideo, splitTimeStamps, setSplitTimeStamps, PROGRESSBAR_IMAGES_COUNT, MAX_VIDEO_LIMIT }} >
+    <StateContext.Provider value={{ theme, setTheme, showEditor, setShowEditor, sourceURLs, setSourceUrls, videoThumbnails, setVideoThumbnails, currUrlIdx, setCurrUrlidx, removeVideo, splitTimeStamps, setSplitTimeStamps, PROGRESSBAR_IMAGES_COUNT, MAX_VIDEO_LIMIT, message, setMessage }} >
       <div className={`${theme}-theme-bg page-container`}>
         <div className="video-editor-container">
           {/* Add editor here */}
@@ -65,6 +67,15 @@ function App() {
             <Uploader />
           }
         </div>
+
+        {message !== null && (
+          <Alert style={{ minWidth: '50%' }} severity={message.type}>
+            {(message?.title !== null && message?.title !== undefined) && (
+              <AlertTitle>{message?.title}</AlertTitle>
+            )}
+            {message.content}
+          </Alert>
+        )}
 
         <div className={`footer-container ${theme === 'dark' ? 'dark-footer' : 'light-footer'}`}>
           <div className={`hover-bg-${theme}`}

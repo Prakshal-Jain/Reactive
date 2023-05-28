@@ -14,6 +14,8 @@ export interface StateContextType {
     setSourceUrls: (setSourceUrls: Array<string>) => void,
     splitTimeStamps: Array<Array<{ start: number, end: number }>>
     setSplitTimeStamps: (split: StateContextType['splitTimeStamps']) => void,
+    message: { type: 'info' | 'success' | 'warning' | 'error', content?: string, title?: string } | null,
+    setMessage: (m: StateContextType['message']) => void,
     PROGRESSBAR_IMAGES_COUNT: number,
     MAX_VIDEO_LIMIT: number,
 }

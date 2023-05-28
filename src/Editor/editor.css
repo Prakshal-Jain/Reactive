@@ -24,7 +24,7 @@
     gap: 2.5rem;
 }
 
-.video-undecided-size-hidden{
+.video-undecided-size-hidden {
     display: none;
     transition: display 0.3s ease;
 }
@@ -40,7 +40,7 @@
     width: 100%;
 }
 
-.controls > .controls-group {
+.controls>.controls-group {
     display: flex;
     flex-direction: row;
     gap: 1rem;
@@ -48,8 +48,7 @@
     justify-content: center;
 }
 
-.controls > .controls-group > .control-btn {
-    background-color: #2f3b44;
+.controls>.controls-group>.control-btn {
     border: 0;
     color: #bac3c7;
     padding: 0.5rem;
@@ -62,15 +61,25 @@
     transition: background-color 0.3s ease;
 }
 
-.controls > .controls-group > .control-btn:hover {
+.controls>.controls-group>.control-btn:hover {
     background-color: #3a4853;
     transition: background-color 0.3s ease;
 }
 
-.control-icon{
+.control-icon {
     width: 1.4rem;
     height: 1.4rem;
 }
+
+.highlited-control-icon {
+    background-color: #455764;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.normal-control-btn {
+    background-color: #2f3b44;
+}
+
 /* ================================ */
 
 /* ============ Progressbar ============ */
@@ -79,7 +88,7 @@
     width: 100%;
 }
 
-.progressbar-container > .progressbar-base {
+.progressbar-container>.progressbar-base {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -92,7 +101,7 @@
     border: 0.1rem solid rgb(91, 91, 97);
 }
 
-.progressbar-container > .progress {
+.progressbar-container>.progress {
     background: #0072cf;
     position: absolute;
     left: 0;
@@ -112,6 +121,7 @@
     background-color: rgba(255, 255, 255, 0.6);
     font-size: small;
 }
+
 /* ================================ */
 
 @media only screen and (max-width: 600px) {

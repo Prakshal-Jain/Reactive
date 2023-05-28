@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { faPause, faPlay, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
+import { faGripLinesVertical, faPause, faPlay, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useRef } from 'react';
@@ -19,6 +19,7 @@ type Props = {
     setSourceUrls: (setSourceUrls: Array<string>) => void,
     splitTimeStamps: StateContextType['splitTimeStamps'],
     setSplitTimeStamps: StateContextType['setSplitTimeStamps'],
+    setMessage: StateContextType['setMessage'],
 }
 
 var throttle = require('lodash/throttle');
@@ -42,7 +43,7 @@ export default function () {
         return null;
     }
 
-    const { sourceURLs, videoThumbnails, removeVideo, currUrlIdx, setSourceUrls, setVideoThumbnails, setCurrUrlidx, splitTimeStamps, setSplitTimeStamps }: Props = ctx;
+    const { sourceURLs, videoThumbnails, removeVideo, currUrlIdx, setSourceUrls, setVideoThumbnails, setCurrUrlidx, splitTimeStamps, setSplitTimeStamps, setMessage }: Props = ctx;
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const playBackBarRef = useRef<HTMLDivElement>(null);
@@ -55,6 +56,8 @@ export default function () {
     const [isMuted, setIsMuted] = useState<boolean>(false);
 
     const [isPlaying, setIsPlaying] = useState<boolean>(videoRef?.current?.paused ?? false);
+
+    const [isAddCroppedSection, setIsAddCroppedSection] = useState<boolean>(false);
 
     const handleLoadedVideo = (videoElement: any) => {
         if (videoElement.clientHeight > videoElement.clientWidth) {
@@ -98,7 +101,7 @@ export default function () {
     }, 500, { leading: false });
 
     const setPlayPause = (always: 'play' | 'pause' | null = null): void => {
-        if(always === null){
+        if (always === null) {
             if (isPlaying) {
                 videoRef?.current?.pause();
             }
@@ -107,11 +110,11 @@ export default function () {
             }
             setIsPlaying(!isPlaying);
         }
-        else if(always === 'play'){
+        else if (always === 'play') {
             videoRef?.current?.play();
             setIsPlaying(true);
         }
-        else{
+        else {
             videoRef?.current?.pause();
             setIsPlaying(false);
         }
@@ -146,7 +149,7 @@ export default function () {
                         </div>
                     )}
 
-                    <Progressbar videoRef={videoRef} setPlayPause={setPlayPause} />
+                    <Progressbar videoRef={videoRef} setPlayPause={setPlayPause} isAddCroppedSection={isAddCroppedSection} setIsAddCroppedSection={setIsAddCroppedSection} />
 
                     {/* <div
                         className='progressbar-base'
@@ -160,10 +163,16 @@ export default function () {
 
                 <div className='controls'>
                     <div className="controls-group">
-                        <button className='control-btn' title='Mute/Unmute Video' onClick={() => setIsMuted(!isMuted)}>{isMuted ? <FontAwesomeIcon icon={faVolumeMute} className='control-icon' /> : <FontAwesomeIcon icon={faVolumeUp} className='control-icon' />}</button>
+                        <button className='control-btn normal-control-btn' title='Mute/Unmute Video' onClick={() => setIsMuted(!isMuted)}>{isMuted ? <FontAwesomeIcon icon={faVolumeMute} className='control-icon' /> : <FontAwesomeIcon icon={faVolumeUp} className='control-icon' />}</button>
                     </div>
                     <div className="controls-group">
-                        <button className='control-btn' title='Play/Pause Video' onClick={() => setPlayPause(null)}>{isPlaying ? <FontAwesomeIcon icon={faPause} className='control-icon' /> : <FontAwesomeIcon icon={faPlay} className='control-icon' />}</button>
+                        <button className='control-btn normal-control-btn' title='Play/Pause Video' onClick={() => setPlayPause(null)}>{isPlaying ? <FontAwesomeIcon icon={faPause} className='control-icon' /> : <FontAwesomeIcon icon={faPlay} className='control-icon' />}</button>
+                    </div>
+                    <div className="controls-group">
+                        <button className={`control-btn ${isAddCroppedSection ? 'highlited-control-icon' : 'normal-control-btn'}`} title='Add Section' onClick={() => {
+                            setIsAddCroppedSection(true);
+                            setMessage({ type: 'info', content: 'Click on any part of the progressbar to add a new cropped section.' })
+                        }}><FontAwesomeIcon icon={faGripLinesVertical} className='control-icon' /></button>
                     </div>
                 </div>
 
