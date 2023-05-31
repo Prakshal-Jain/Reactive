@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { faGripLinesVertical, faPause, faPlay, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
+import { faPause, faPlay, faRemove, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useRef } from 'react';
@@ -8,6 +8,7 @@ import PreviewGallery from '../components/PreviewGallery';
 import { StateContext, StateContextType } from '../state_context';
 import { useEffect } from 'react';
 import Progressbar from '../components/Progressbar';
+import croppedsection from '../assets/croppedsection.svg';
 
 type Props = {
     sourceURLs: Array<string>,
@@ -169,10 +170,20 @@ export default function () {
                         <button className='control-btn normal-control-btn' title='Play/Pause Video' onClick={() => setPlayPause(null)}>{isPlaying ? <FontAwesomeIcon icon={faPause} className='control-icon' /> : <FontAwesomeIcon icon={faPlay} className='control-icon' />}</button>
                     </div>
                     <div className="controls-group">
-                        <button className={`control-btn ${isAddCroppedSection ? 'highlited-control-icon' : 'normal-control-btn'}`} title='Add Section' onClick={() => {
-                            setIsAddCroppedSection(true);
-                            setMessage({ type: 'info', content: 'Click on any part of the progressbar to add a new cropped section.' })
-                        }}><FontAwesomeIcon icon={faGripLinesVertical} className='control-icon' /></button>
+                        <button className={`control-btn ${isAddCroppedSection ? 'highlited-control-icon' : 'normal-control-btn'}`} title='Add Section'
+                            onClick={
+                                isAddCroppedSection ?
+                                    () => {
+                                        setIsAddCroppedSection(false);
+                                        setMessage(null);
+                                    }
+                                    :
+                                    () => {
+                                        setIsAddCroppedSection(true);
+                                        setMessage({ type: 'info', content: 'Click on any part of the progressbar to add a new cropped section.' });
+                                    }}>
+                            {isAddCroppedSection ? <FontAwesomeIcon icon={faRemove} className='control-icon' style={{color: '#FF3333'}} /> : <img src={croppedsection} className='control-icon' />}
+                        </button>
                     </div>
                 </div>
 

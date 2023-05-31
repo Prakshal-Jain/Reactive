@@ -215,7 +215,7 @@ export default function Progressbar({ videoRef, setPlayPause, isAddCroppedSectio
         const boundingRect = progressRef.current?.getBoundingClientRect();
 
         if (videoDuration === undefined || mouseMoveData !== null || boundingRect === null || boundingRect === undefined) {
-            setMessage({type: 'error', title: 'Cannot add a new section', content: 'Something went wrong. Please try again.'});
+            setMessage({ type: 'error', title: 'Cannot add a new section', content: 'Something went wrong. Please try again.' });
             return
         }
 
@@ -225,7 +225,7 @@ export default function Progressbar({ videoRef, setPlayPause, isAddCroppedSectio
         const idx = findTimestampIndexHelper(startTime);
 
         if (idx === null) {
-            setMessage({type: 'error', title: 'Cannot add a new section', content: "Please make sure you click on the part of progress bar that is not already a section."})
+            setMessage({ type: 'error', title: 'Cannot add a new section', content: "Please make sure you click on the part of progress bar that is not already a section." })
             return
         }
 
@@ -233,6 +233,7 @@ export default function Progressbar({ videoRef, setPlayPause, isAddCroppedSectio
         const timestamps = [...splitTimeStamps];
         timestamps[currUrlIdx]?.splice(idx, 0, { start: startTime, end: startTime + addNewCroppedSectionThreshold })
         setSplitTimeStamps(timestamps);
+        setMessage(null);
     }
 
     return (
@@ -247,7 +248,7 @@ export default function Progressbar({ videoRef, setPlayPause, isAddCroppedSectio
                 handleMouseMove(mouseMoveData.index, Math.abs(event.clientX - boundingRect?.left), mouseMoveData?.type);
             }}
             key={`progressbar-${currUrlIdx}-width_${windowDimensions.width}-height_${windowDimensions.height}`}
-            onClick={handleAddNewCroppedSection}
+            onClick={isAddCroppedSection ? handleAddNewCroppedSection : () => { }}
         >
             {(imgWidth !== null && videoThumbnails !== null && videoThumbnails[currUrlIdx] !== null) ? (
                 videoThumbnails[currUrlIdx]?.thumbnails.map((img, index) => (
