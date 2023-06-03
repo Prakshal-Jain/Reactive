@@ -138,6 +138,7 @@ export default function () {
                     className={`video-element ${isPortrait ? 'portrait' : 'landscape'}`}
                     muted={isMuted}
                     onClick={() => setPlayPause(null)}
+                    onEnded={() => setPlayPause('pause')}
                     key={`${videoThumbnails[currUrlIdx]?.name}-${currUrlIdx}-video-element`}
                 >
                     <source src={sourceURLs[currUrlIdx]} type='video/mp4' />
@@ -151,15 +152,6 @@ export default function () {
                     )}
 
                     <Progressbar videoRef={videoRef} setPlayPause={setPlayPause} isAddCroppedSection={isAddCroppedSection} setIsAddCroppedSection={setIsAddCroppedSection} />
-
-                    {/* <div
-                        className='progressbar-base'
-                        ref={playBackBarRef}
-                        onClick={(event) => updateProgress(event.clientX)}
-                        onMouseEnter={() => { setSeekTime(null); }}
-                        onMouseMove={(event) => displayVideoSeekTime(event.clientX)}
-                        onMouseLeave={() => { setSeekTime(null); displayVideoSeekTime.cancel() }}
-                    /> */}
                 </div>
 
                 <div className='controls'>
@@ -182,7 +174,7 @@ export default function () {
                                         setIsAddCroppedSection(true);
                                         setMessage({ type: 'info', content: 'Click on any part of the progressbar to add a new cropped section.' });
                                     }}>
-                            {isAddCroppedSection ? <FontAwesomeIcon icon={faRemove} className='control-icon' style={{color: '#FF3333'}} /> : <img src={croppedsection} className='control-icon' />}
+                            {isAddCroppedSection ? <FontAwesomeIcon icon={faRemove} className='control-icon' style={{ color: '#FF3333' }} /> : <img src={croppedsection} className='control-icon' />}
                         </button>
                     </div>
                 </div>
